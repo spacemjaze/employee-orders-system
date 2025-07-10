@@ -3,29 +3,34 @@ const { Pool } = require('pg');
 // إعداد الاتصال بقاعدة البيانات
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+    ssl: { rejectUnauthorized: false },
     max: 20,
     idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 2000,
+    connectionTimeoutMillis: 10000,
 });
 
-export default async function handler(req, res) {
-    // إعداد CORS
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    
-    if (req.method === 'OPTIONS') {
-        res.status(200).end();
-        return;
+exports.handler = async (event, context) => {
+    const headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+    };
+
+    if (event.httpMethod === 'OPTIONS') {
+        return { statusCode: 200, headers, body: '' };
     }
 
-    if (req.method !== 'GET') {
-        return res.status(405).json({ success: false, message: 'Method not allowed' });
+    if (event.httpMethod !== 'GET') {
+        return {
+            statusCode: 405,
+            headers,
+            body: JSON.stringify({ success: false, message: 'Method not allowed' })
+        };
     }
 
     try {
-        const { employeeId, limit = 10, offset = 0 } = req.query;
+        // استخراج المعاملات من query parameters
+        const { employeeId, limit = 10, offset = 0 } = event.queryStringParameters || {};
         
         let query = `
             SELECT 
@@ -48,17 +53,25 @@ export default async function handler(req, res) {
 
         const result = await pool.query(query, params);
 
-        res.json({
-            success: true,
-            orders: result.rows,
-            total: result.rows.length
-        });
+        return {
+            statusCode: 200,
+            headers,
+            body: JSON.stringify({
+                success: true,
+                orders: result.rows,
+                total: result.rows.length
+            })
+        };
 
     } catch (error) {
         console.error('خطأ في جلب الأوردرات:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'خطأ في جلب الأوردرات: ' + error.message 
-        });
+        return {
+            statusCode: 500,
+            headers,
+            body: JSON.stringify({ 
+                success: false, 
+                message: 'خطأ في جلب الأوردرات: ' + error.message 
+            })
+        };
     }
-}
+};
