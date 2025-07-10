@@ -1,6 +1,5 @@
 const { Pool } = require('pg');
 
-// إعداد الاتصال بقاعدة البيانات
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false },
@@ -29,7 +28,6 @@ exports.handler = async (event, context) => {
     }
 
     try {
-        // استخراج employeeId من query parameters
         const { employeeId } = event.queryStringParameters || {};
         
         if (!employeeId) {
