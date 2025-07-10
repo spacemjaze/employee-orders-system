@@ -3,28 +3,43 @@ const { Pool } = require('pg');
 // إعداد الاتصال بقاعدة البيانات
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+    ssl: { rejectUnauthorized: false },
     max: 20,
     idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 2000,
+    connectionTimeoutMillis: 10000,
 });
 
-export default async function handler(req, res) {
-    // إعداد CORS
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    
-    if (req.method === 'OPTIONS') {
-        res.status(200).end();
-        return;
+exports.handler = async (event, context) => {
+    const headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+    };
+
+    if (event.httpMethod === 'OPTIONS') {
+        return { statusCode: 200, headers, body: '' };
     }
 
-    if (req.method !== 'POST') {
-        return res.status(405).json({ success: false, message: 'Method not allowed' });
+    if (event.httpMethod !== 'POST') {
+        return {
+            statusCode: 405,
+            headers,
+            body: JSON.stringify({ success: false, message: 'Method not allowed' })
+        };
     }
 
     try {
+        if (!event.body) {
+            return {
+                statusCode: 400,
+                headers,
+                body: JSON.stringify({ 
+                    success: false, 
+                    message: 'لا توجد بيانات في الطلب' 
+                })
+            };
+        }
+
         const {
             employeeId,
             orderType,
@@ -40,14 +55,18 @@ export default async function handler(req, res) {
             orderStartTime,
             orderEndTime,
             orderDurationMs
-        } = req.body;
+        } = JSON.parse(event.body);
 
         // التحقق من البيانات المطلوبة
         if (!employeeId || !orderType || !orderDetails || !senderName) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'بيانات غير مكتملة' 
-            });
+            return {
+                statusCode: 400,
+                headers,
+                body: JSON.stringify({ 
+                    success: false, 
+                    message: 'بيانات غير مكتملة' 
+                })
+            };
         }
 
         // إدراج الأوردر في قاعدة البيانات
@@ -84,17 +103,25 @@ export default async function handler(req, res) {
             status === 'غير مكتمل' ? 1 : 0
         ]);
 
-        res.json({
-            success: true,
-            message: 'تم حفظ الأوردر بنجاح',
-            orderId: result.rows[0].id
-        });
+        return {
+            statusCode: 200,
+            headers,
+            body: JSON.stringify({
+                success: true,
+                message: 'تم حفظ الأوردر بنجاح',
+                orderId: result.rows[0].id
+            })
+        };
 
     } catch (error) {
         console.error('خطأ في حفظ الأوردر:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'خطأ في حفظ الأوردر: ' + error.message 
-        });
+        return {
+            statusCode: 500,
+            headers,
+            body: JSON.stringify({ 
+                success: false, 
+                message: 'خطأ في حفظ الأوردر: ' + error.message 
+            })
+        };
     }
-}
+};
