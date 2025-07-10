@@ -107,26 +107,216 @@
             box-shadow: none;
         }
 
+        .secondary-btn {
+            background: #6c757d;
+        }
+
+        .secondary-btn:hover:not(:disabled) {
+            background: #545b62;
+        }
+
+        .danger-btn {
+            background: linear-gradient(45deg, #dc3545, #c82333);
+        }
+
+        .danger-btn:hover:not(:disabled) {
+            box-shadow: 0 8px 25px rgba(220, 53, 69, 0.3);
+        }
+
+        .camera-container {
+            position: relative;
+            margin: 20px 0;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 3px solid #e1e5e9;
+        }
+
+        video, canvas {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 12px;
+            display: block;
+        }
+
         .status {
             padding: 15px;
             border-radius: 12px;
             margin: 15px 0;
             font-weight: 600;
             font-size: 14px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .status.success {
             background: linear-gradient(45deg, #d4edda, #c3e6cb);
             color: #155724;
+            border: 1px solid #c3e6cb;
         }
 
         .status.error {
             background: linear-gradient(45deg, #f8d7da, #f5c6cb);
             color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.info {
+            background: linear-gradient(45deg, #d1ecf1, #bee5eb);
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .status.warning {
+            background: linear-gradient(45deg, #fff3cd, #ffeaa7);
+            color: #856404;
+            border: 1px solid #ffeaa7;
         }
 
         .hidden {
             display: none;
+        }
+
+        .location-info {
+            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+            font-size: 14px;
+            color: #666;
+            border: 1px solid #dee2e6;
+        }
+
+        .photo-preview {
+            max-width: 300px;
+            border-radius: 15px;
+            margin: 15px 0;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .login-section {
+            margin-bottom: 30px;
+        }
+
+        .order-section {
+            display: none;
+        }
+
+        .employee-info {
+            background: linear-gradient(45deg, #e8f5e8, #d4edda);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border: 2px solid #28a745;
+            color: #155724;
+        }
+
+        .employee-info h3 {
+            margin-bottom: 8px;
+            font-size: 20px;
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .stats-card {
+            background: linear-gradient(45deg, #e3f2fd, #bbdefb);
+            border: 1px solid #90caf9;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 10px 0;
+            color: #0d47a1;
+            font-size: 14px;
+        }
+
+        .order-history {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 20px 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .order-history h4 {
+            margin-bottom: 10px;
+            color: #495057;
+        }
+
+        .order-item {
+            background: white;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            font-size: 12px;
+        }
+
+        .character-count {
+            text-align: left;
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        .connection-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 12px;
+            z-index: 1000;
+            display: none;
+        }
+
+        .connection-status.online {
+            background: rgba(40, 167, 69, 0.9);
+        }
+
+        .connection-status.offline {
+            background: rgba(220, 53, 69, 0.9);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            h1 {
+                font-size: 22px;
+            }
+            
+            button {
+                padding: 12px 20px;
+                font-size: 14px;
+            }
         }
     </style>
 </head>
@@ -134,56 +324,673 @@
     <div class="container">
         <h1>نظام تسجيل أوردرات الموظفين</h1>
         
-        <div class="form-group">
-            <label for="username">اسم المستخدم:</label>
-            <input type="text" id="username" placeholder="أدخل اسم المستخدم">
+        <!-- قسم تسجيل الدخول -->
+        <div class="login-section" id="loginSection">
+            <div class="form-group">
+                <label for="username">اسم المستخدم:</label>
+                <input type="text" id="username" placeholder="أدخل اسم المستخدم" autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label for="password">كلمة المرور:</label>
+                <input type="password" id="password" placeholder="أدخل كلمة المرور" autocomplete="current-password">
+            </div>
+            <button onclick="login()">تسجيل الدخول</button>
+            <div id="loginError" class="status error hidden"></div>
         </div>
-        
-        <div class="form-group">
-            <label for="password">كلمة المرور:</label>
-            <input type="password" id="password" placeholder="أدخل كلمة المرور">
+
+        <!-- قسم تسجيل الأوردر -->
+        <div class="order-section" id="orderSection">
+            <div class="employee-info" id="employeeInfo">
+                <h3>مرحباً، <span id="employeeName"></span></h3>
+                <p>رقم الموظف: <span id="employeeId"></span></p>
+                <p>آخر تسجيل دخول: <span id="lastLogin"></span></p>
+            </div>
+
+            <div class="stats-card">
+                <strong>إحصائيات اليوم:</strong>
+                <div>الأوردرات المسجلة: <span id="todayOrders">0</span></div>
+                <div>آخر أوردر: <span id="lastOrderTime">لا يوجد</span></div>
+                <div id="currentOrderTimer" class="hidden" style="color: #667eea; font-weight: bold;">
+                    ⏱️ الأوردر الحالي: <span id="timerDisplay">00:00</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="orderType">نوع الأوردر:</label>
+                <select id="orderType">
+                    <option value="">اختر نوع الأوردر</option>
+                    <option value="استطلاع">استطلاع</option>
+                    <option value="ريلز">ريلز</option>
+                    <option value="معالم">معالم</option>
+                    <option value="قصة">قصة</option>
+                    <option value="وثائقي">وثائقي</option>
+                    <option value="فوتو">فوتو</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="orderDetails">تفاصيل الأوردر:</label>
+                <textarea id="orderDetails" rows="4" placeholder="اكتب تفاصيل الأوردر هنا..."></textarea>
+                <div class="character-count">
+                    <span id="charCount">0</span> حرف
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="senderName">اسم المراسل أو المقدم:</label>
+                <input type="text" id="senderName" placeholder="اسم المراسل أو المقدم">
+            </div>
+
+            <div class="button-group">
+                <button onclick="getLocationManually()" id="locationBtn" class="secondary-btn">تحديد الموقع الحالي</button>
+            </div>
+            
+            <div class="location-info hidden" id="locationInfo">
+                <strong>الموقع المحدد:</strong> 
+                <span id="locationText">لم يتم تحديد الموقع بعد</span>
+                <div id="locationAccuracy" class="hidden">
+                    دقة الموقع: <span id="accuracyText"></span> متر
+                </div>
+            </div>
+
+            <div class="camera-container">
+                <video id="camera" autoplay playsinline class="hidden"></video>
+                <canvas id="canvas" class="hidden"></canvas>
+                <img id="photoPreview" class="photo-preview hidden" />
+            </div>
+
+            <div class="button-group">
+                <button onclick="startCamera()">تشغيل الكاميرا</button>
+                <button onclick="takePhoto()" id="takePhotoBtn" disabled>التقاط صورة</button>
+                <button onclick="retakePhoto()" id="retakePhotoBtn" class="secondary-btn hidden">التقاط مرة أخرى</button>
+            </div>
+
+            <div class="loading-spinner" id="loadingSpinner"></div>
+
+            <div class="button-group">
+                <button onclick="startOrder()" id="startOrderBtn">بدء الأوردر</button>
+                <button onclick="completeOrder()" id="completeOrderBtn" disabled>إكمال الأوردر</button>
+                <button onclick="showIncompleteDialog()" id="incompleteOrderBtn" class="danger-btn" disabled>لم يكتمل الأوردر</button>
+                <button onclick="logout()" class="secondary-btn">تسجيل الخروج</button>
+            </div>
+
+            <div class="order-history hidden" id="orderHistory">
+                <h4>الأوردرات الأخيرة</h4>
+                <div id="orderHistoryList"></div>
+            </div>
         </div>
-        
-        <button onclick="login()">تسجيل الدخول</button>
-        
+
         <div id="status" class="status hidden"></div>
     </div>
 
+    <!-- مؤشر حالة الاتصال -->
+    <div id="connectionStatus" class="connection-status">
+        <span id="connectionText">جاري التحقق من الاتصال...</span>
+    </div>
+
     <script>
+        // إعداد API - سيتم تحديثه تلقائياً على Vercel
         const API_BASE_URL = '/api';
         
+        // متغيرات عامة
+        let currentEmployee = null;
+        let currentLocation = null;
+        let photoData = null;
+        let camera = null;
+        let orderStarted = false;
+        let orderStartTime = null;
+        let timerInterval = null;
+        let connectionCheckInterval = null;
+        
+        // مراقبة حالة الاتصال
+        function checkConnection() {
+            const statusElement = document.getElementById('connectionStatus');
+            const textElement = document.getElementById('connectionText');
+            
+            if (navigator.onLine) {
+                statusElement.className = 'connection-status online';
+                textElement.textContent = 'متصل';
+                setTimeout(() => {
+                    statusElement.style.display = 'none';
+                }, 2000);
+            } else {
+                statusElement.className = 'connection-status offline';
+                textElement.textContent = 'غير متصل';
+                statusElement.style.display = 'block';
+            }
+        }
+        
+        // دالة مساعدة للطلبات HTTP مع معالجة الأخطاء
+        async function makeRequest(url, options = {}) {
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    },
+                    ...options
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.message || 'حدث خطأ في الطلب');
+                }
+                
+                return data;
+            } catch (error) {
+                console.error('خطأ في الطلب:', error);
+                
+                // معالجة أخطاء الاتصال
+                if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    throw new Error('خطأ في الاتصال بالخادم');
+                }
+                
+                throw error;
+            }
+        }
+
+        // تسجيل الدخول
         async function login() {
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value.trim();
             
             if (!username || !password) {
-                showStatus('يرجى إدخال اسم المستخدم وكلمة المرور', 'error');
+                showLoginError('يرجى إدخال اسم المستخدم وكلمة المرور');
                 return;
             }
-            
+
             try {
                 showStatus('جاري تسجيل الدخول...', 'info');
                 
-                const response = await fetch(`${API_BASE_URL}/login`, {
+                const result = await makeRequest(`${API_BASE_URL}/login`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
                     body: JSON.stringify({ username, password })
                 });
+
+                currentEmployee = result.employee;
                 
-                const data = await response.json();
+                // تحديث الواجهة
+                document.getElementById('employeeName').textContent = currentEmployee.name;
+                document.getElementById('employeeId').textContent = currentEmployee.employee_id;
+                document.getElementById('lastLogin').textContent = currentEmployee.lastLogin;
+                document.getElementById('todayOrders').textContent = currentEmployee.todayOrders;
                 
-                if (data.success) {
-                    showStatus('تم تسجيل الدخول بنجاح!', 'success');
-                } else {
-                    showStatus(data.message || 'خطأ في تسجيل الدخول', 'error');
-                }
+                // إخفاء قسم تسجيل الدخول وإظهار قسم الأوردر
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('orderSection').style.display = 'block';
+                document.getElementById('loginError').classList.add('hidden');
+                
+                // تحميل الإحصائيات
+                await loadEmployeeStats();
+                
+                showStatus('تم تسجيل الدخول بنجاح', 'success');
+                
             } catch (error) {
-                showStatus('خطأ في الاتصال بالخادم', 'error');
+                showLoginError(error.message);
             }
         }
-        
+
+        // تحميل إحصائيات الموظف
+        async function loadEmployeeStats() {
+            try {
+                const result = await makeRequest(`${API_BASE_URL}/employee-stats?employeeId=${currentEmployee.id}`);
+                
+                // تحديث الإحصائيات
+                document.getElementById('todayOrders').textContent = result.todayStats.total_orders;
+                
+                // تحديث السجل
+                updateOrderHistoryDisplay(result.recentOrders);
+                
+            } catch (error) {
+                console.error('خطأ في تحميل الإحصائيات:', error);
+            }
+        }
+
+        // حفظ الأوردر
+        async function saveOrder(orderData) {
+            try {
+                showStatus('جاري حفظ الأوردر...', 'info');
+                document.getElementById('loadingSpinner').style.display = 'block';
+                
+                const result = await makeRequest(`${API_BASE_URL}/save-order`, {
+                    method: 'POST',
+                    body: JSON.stringify(orderData)
+                });
+                
+                showStatus('تم حفظ الأوردر بنجاح!', 'success');
+                
+                // تحديث الإحصائيات
+                currentEmployee.todayOrders++;
+                document.getElementById('todayOrders').textContent = currentEmployee.todayOrders;
+                document.getElementById('lastOrderTime').textContent = new Date().toLocaleTimeString('en-GB');
+                
+                // إعادة تحميل الإحصائيات
+                await loadEmployeeStats();
+                
+                resetForm();
+                
+            } catch (error) {
+                showStatus('خطأ في حفظ الأوردر: ' + error.message, 'error');
+            } finally {
+                document.getElementById('loadingSpinner').style.display = 'none';
+            }
+        }
+
+        // تسجيل الخروج
+        async function logout() {
+            try {
+                if (currentEmployee) {
+                    await makeRequest(`${API_BASE_URL}/logout`, {
+                        method: 'POST',
+                        body: JSON.stringify({ employeeId: currentEmployee.id })
+                    });
+                }
+                
+                // إعادة تعيين المتغيرات
+                currentEmployee = null;
+                currentLocation = null;
+                photoData = null;
+                orderStarted = false;
+                orderStartTime = null;
+                
+                // إيقاف الكاميرا
+                if (camera) {
+                    camera.getTracks().forEach(track => track.stop());
+                    camera = null;
+                }
+                
+                // إيقاف العداد
+                stopOrderTimer();
+                
+                // إعادة تعيين الواجهة
+                document.getElementById('loginSection').style.display = 'block';
+                document.getElementById('orderSection').style.display = 'none';
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
+                document.getElementById('loginError').classList.add('hidden');
+                
+                resetForm();
+                showStatus('تم تسجيل الخروج', 'info');
+                
+            } catch (error) {
+                console.error('خطأ في تسجيل الخروج:', error);
+            }
+        }
+
+        // تحديد الموقع يدوياً
+        function getLocationManually() {
+            document.getElementById('locationBtn').disabled = true;
+            document.getElementById('locationBtn').textContent = 'جاري تحديد الموقع...';
+            
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        currentLocation = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                            accuracy: position.coords.accuracy
+                        };
+                        
+                        document.getElementById('locationText').textContent = 
+                            `خط العرض: ${currentLocation.latitude.toFixed(6)}, خط الطول: ${currentLocation.longitude.toFixed(6)}`;
+                        
+                        document.getElementById('accuracyText').textContent = Math.round(currentLocation.accuracy);
+                        document.getElementById('locationAccuracy').classList.remove('hidden');
+                        document.getElementById('locationInfo').classList.remove('hidden');
+                        
+                        document.getElementById('locationBtn').disabled = false;
+                        document.getElementById('locationBtn').textContent = 'تم تحديد الموقع ✓';
+                        document.getElementById('locationBtn').style.background = 'linear-gradient(45deg, #28a745, #20c997)';
+                        
+                        showStatus('تم تحديد الموقع بنجاح', 'success');
+                    },
+                    (error) => {
+                        document.getElementById('locationBtn').disabled = false;
+                        document.getElementById('locationBtn').textContent = 'تحديد الموقع الحالي';
+                        
+                        let errorMessage = 'فشل في تحديد الموقع';
+                        switch(error.code) {
+                            case error.PERMISSION_DENIED:
+                                errorMessage = 'قم بتفعيل موقعك في إعدادات المتصفح للمتابعة';
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                errorMessage = 'موقعك غير متاح حالياً';
+                                break;
+                            case error.TIMEOUT:
+                                errorMessage = 'انتهت مهلة تحديد الموقع - حاول مرة أخرى';
+                                break;
+                        }
+                        
+                        showStatus(errorMessage, 'error');
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 15000,
+                        maximumAge: 300000
+                    }
+                );
+            } else {
+                document.getElementById('locationBtn').disabled = false;
+                document.getElementById('locationBtn').textContent = 'تحديد الموقع الحالي';
+                showStatus('المتصفح لا يدعم تحديد الموقع', 'error');
+            }
+        }
+
+        // تشغيل الكاميرا
+        async function startCamera() {
+            try {
+                const video = document.getElementById('camera');
+                camera = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        facingMode: 'user',
+                        width: { ideal: 640 },
+                        height: { ideal: 480 }
+                    } 
+                });
+                
+                video.srcObject = camera;
+                video.classList.remove('hidden');
+                
+                document.getElementById('takePhotoBtn').disabled = false;
+                showStatus('تم تشغيل الكاميرا', 'success');
+            } catch (error) {
+                showStatus('خطأ في تشغيل الكاميرا: ' + error.message, 'error');
+            }
+        }
+
+        // التقاط الصورة
+        function takePhoto() {
+            const video = document.getElementById('camera');
+            const canvas = document.getElementById('canvas');
+            const preview = document.getElementById('photoPreview');
+            
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0);
+            
+            photoData = canvas.toDataURL('image/jpeg', 0.8);
+            
+            preview.src = photoData;
+            preview.classList.remove('hidden');
+            video.classList.add('hidden');
+            
+            document.getElementById('completeOrderBtn').disabled = false;
+            document.getElementById('retakePhotoBtn').classList.remove('hidden');
+            document.getElementById('takePhotoBtn').disabled = true;
+            
+            showStatus('تم التقاط الصورة', 'success');
+        }
+
+        // إعادة التقاط الصورة
+        function retakePhoto() {
+            const video = document.getElementById('camera');
+            const preview = document.getElementById('photoPreview');
+            
+            preview.classList.add('hidden');
+            video.classList.remove('hidden');
+            
+            document.getElementById('retakePhotoBtn').classList.add('hidden');
+            document.getElementById('takePhotoBtn').disabled = false;
+            document.getElementById('completeOrderBtn').disabled = true;
+            
+            photoData = null;
+            showStatus('يمكنك التقاط صورة جديدة', 'info');
+        }
+
+        // بدء الأوردر
+        function startOrder() {
+            orderStarted = true;
+            orderStartTime = new Date();
+            
+            document.getElementById('startOrderBtn').disabled = true;
+            document.getElementById('startOrderBtn').textContent = 'تم بدء الأوردر ✓';
+            document.getElementById('startOrderBtn').style.background = 'linear-gradient(45deg, #28a745, #20c997)';
+            
+            document.getElementById('completeOrderBtn').disabled = false;
+            document.getElementById('incompleteOrderBtn').disabled = false;
+            
+            document.getElementById('currentOrderTimer').classList.remove('hidden');
+            startOrderTimer();
+            
+            showStatus(`تم بدء الأوردر - الوقت: ${orderStartTime.toLocaleTimeString('en-GB')}`, 'success');
+        }
+
+        // بدء العداد الزمني للأوردر
+        function startOrderTimer() {
+            timerInterval = setInterval(() => {
+                if (orderStartTime) {
+                    const now = new Date();
+                    const diff = now.getTime() - orderStartTime.getTime();
+                    const minutes = Math.floor(diff / 60000);
+                    const seconds = Math.floor((diff % 60000) / 1000);
+                    
+                    const timerDisplay = document.getElementById('timerDisplay');
+                    timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                }
+            }, 1000);
+        }
+
+        // إيقاف العداد الزمني
+        function stopOrderTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            document.getElementById('currentOrderTimer').classList.add('hidden');
+        }
+
+        // حساب مدة الأوردر
+        function calculateOrderDuration() {
+            if (!orderStartTime) return null;
+            
+            const endTime = new Date();
+            const durationMs = endTime.getTime() - orderStartTime.getTime();
+            const durationMinutes = Math.floor(durationMs / 60000);
+            const durationSeconds = Math.floor((durationMs % 60000) / 1000);
+            
+            return {
+                startTime: orderStartTime.toLocaleTimeString('en-GB'),
+                endTime: endTime.toLocaleTimeString('en-GB'),
+                durationMs: durationMs,
+                durationText: `${durationMinutes} دقيقة و ${durationSeconds} ثانية`
+            };
+        }
+
+        // التحقق من صحة البيانات
+        function validateOrder() {
+            const orderType = document.getElementById('orderType').value;
+            const orderDetails = document.getElementById('orderDetails').value.trim();
+            const senderName = document.getElementById('senderName').value.trim();
+            
+            if (!orderStarted) {
+                showStatus('يرجى الضغط على "بدء الأوردر" أولاً', 'error');
+                return false;
+            }
+            
+            if (!orderType) {
+                showStatus('يرجى اختيار نوع الأوردر', 'error');
+                return false;
+            }
+            
+            if (!orderDetails) {
+                showStatus('يرجى إدخال تفاصيل الأوردر', 'error');
+                return false;
+            }
+            
+            if (orderDetails.length < 10) {
+                showStatus('تفاصيل الأوردر قصيرة جداً (الحد الأدنى 10 أحرف)', 'error');
+                return false;
+            }
+            
+            if (!senderName) {
+                showStatus('يرجى إدخال اسم المراسل', 'error');
+                return false;
+            }
+            
+            if (!photoData) {
+                showStatus('يرجى التقاط صورة', 'error');
+                return false;
+            }
+            
+            return true;
+        }
+
+        // إكمال الأوردر
+        async function completeOrder() {
+            if (!validateOrder()) {
+                return;
+            }
+            
+            const orderDuration = calculateOrderDuration();
+            
+            const orderData = {
+                employeeId: currentEmployee.id,
+                orderType: document.getElementById('orderType').value,
+                orderDetails: document.getElementById('orderDetails').value.trim(),
+                senderName: document.getElementById('senderName').value.trim(),
+                locationLatitude: currentLocation ? currentLocation.latitude : null,
+                locationLongitude: currentLocation ? currentLocation.longitude : null,
+                locationAccuracy: currentLocation ? currentLocation.accuracy : null,
+                photoData: photoData,
+                status: 'مكتمل',
+                sessionId: Date.now().toString(36) + Math.random().toString(36).substr(2),
+                orderStartTime: orderDuration ? orderDuration.startTime : null,
+                orderEndTime: orderDuration ? orderDuration.endTime : null,
+                orderDurationMs: orderDuration ? orderDuration.durationMs : null
+            };
+            
+            stopOrderTimer();
+            await saveOrder(orderData);
+        }
+
+        // عرض نافذة عدم الاكتمال
+        function showIncompleteDialog() {
+            const reason = prompt('لماذا لم يكتمل الأوردر؟\n\nاختر من الأسباب التالية أو اكتب سبب آخر:\n' +
+                '1. مشكلة في الكاميرا\n' +
+                '2. نفاذ شحن بطارية الكاميرا\n' +
+                '3. رفض المقدم التصوير\n' +
+                '4. مشكلة في تحديد الموقع\n' +
+                '5. ظروف طارئة\n' +
+                '6. أخرى (اكتب السبب)');
+            
+            if (reason && reason.trim()) {
+                submitIncompleteOrder(reason.trim());
+            }
+        }
+
+        // تسجيل الأوردر غير المكتمل
+        async function submitIncompleteOrder(reason) {
+            const orderDuration = calculateOrderDuration();
+
+            const incompleteData = {
+                employeeId: currentEmployee.id,
+                orderType: document.getElementById('orderType').value || 'غير محدد',
+                orderDetails: document.getElementById('orderDetails').value.trim() || 'لم يكتمل',
+                senderName: document.getElementById('senderName').value.trim() || 'غير محدد',
+                locationLatitude: currentLocation ? currentLocation.latitude : null,
+                locationLongitude: currentLocation ? currentLocation.longitude : null,
+                locationAccuracy: currentLocation ? currentLocation.accuracy : null,
+                photoData: photoData,
+                status: 'غير مكتمل',
+                incompleteReason: reason,
+                sessionId: Date.now().toString(36) + Math.random().toString(36).substr(2),
+                orderStartTime: orderDuration ? orderDuration.startTime : null,
+                orderEndTime: orderDuration ? orderDuration.endTime : null,
+                orderDurationMs: orderDuration ? orderDuration.durationMs : null
+            };
+
+            stopOrderTimer();
+            await saveOrder(incompleteData);
+        }
+
+        // إعادة تعيين النموذج
+        function resetForm() {
+            orderStarted = false;
+            orderStartTime = null;
+            stopOrderTimer();
+            
+            document.getElementById('orderType').value = '';
+            document.getElementById('orderDetails').value = '';
+            document.getElementById('senderName').value = '';
+            document.getElementById('photoPreview').classList.add('hidden');
+            document.getElementById('camera').classList.add('hidden');
+            document.getElementById('retakePhotoBtn').classList.add('hidden');
+            document.getElementById('takePhotoBtn').disabled = true;
+            
+            document.getElementById('startOrderBtn').disabled = false;
+            document.getElementById('startOrderBtn').textContent = 'بدء الأوردر';
+            document.getElementById('startOrderBtn').style.background = '';
+            document.getElementById('completeOrderBtn').disabled = true;
+            document.getElementById('incompleteOrderBtn').disabled = true;
+            
+            // إعادة تعيين الموقع
+            document.getElementById('locationInfo').classList.add('hidden');
+            document.getElementById('locationBtn').disabled = false;
+            document.getElementById('locationBtn').textContent = 'تحديد الموقع الحالي';
+            document.getElementById('locationBtn').style.background = '';
+            currentLocation = null;
+            
+            updateCharCount();
+            photoData = null;
+            
+            if (camera) {
+                camera.getTracks().forEach(track => track.stop());
+                camera = null;
+            }
+        }
+
+        // تحديث عداد الأحرف
+        function updateCharCount() {
+            const textarea = document.getElementById('orderDetails');
+            const charCount = document.getElementById('charCount');
+            
+            if (textarea && charCount) {
+                const currentLength = textarea.value.length;
+                charCount.textContent = currentLength;
+            }
+        }
+
+        // تحديث عرض سجل الأوردرات
+        function updateOrderHistoryDisplay(orders) {
+            const historyDiv = document.getElementById('orderHistory');
+            const historyList = document.getElementById('orderHistoryList');
+            
+            if (orders && orders.length > 0) {
+                historyDiv.classList.remove('hidden');
+                historyList.innerHTML = '';
+                
+                orders.forEach(order => {
+                    const orderDiv = document.createElement('div');
+                    orderDiv.className = 'order-item';
+                    orderDiv.innerHTML = `
+                        <div><strong>${order.order_type}</strong></div>
+                        <div>${order.order_details.substring(0, 50)}...</div>
+                        <div style="color: #666; font-size: 11px;">${order.formatted_date || new Date(order.created_at).toLocaleString('en-GB')}</div>
+                    `;
+                    historyList.appendChild(orderDiv);
+                });
+            }
+        }
+
+        // عرض رسالة خطأ تسجيل الدخول
+        function showLoginError(message) {
+            const errorDiv = document.getElementById('loginError');
+            errorDiv.textContent = message;
+            errorDiv.classList.remove('hidden');
+            
+            setTimeout(() => {
+                errorDiv.classList.add('hidden');
+            }, 5000);
+        }
+
+        // عرض رسالة الحالة
         function showStatus(message, type) {
             const statusDiv = document.getElementById('status');
             statusDiv.textContent = message;
@@ -194,6 +1001,43 @@
                 statusDiv.classList.add('hidden');
             }, 4000);
         }
+
+        // إضافة المستمعين للأحداث
+        document.addEventListener('DOMContentLoaded', function() {
+            // مراقبة حالة الاتصال
+            window.addEventListener('online', checkConnection);
+            window.addEventListener('offline', checkConnection);
+            checkConnection();
+            
+            // تسجيل الدخول بالضغط على Enter
+            document.getElementById('username').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    login();
+                }
+            });
+            
+            document.getElementById('password').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    login();
+                }
+            });
+
+            // مراقبة عدد الأحرف
+            document.getElementById('orderDetails').addEventListener('input', updateCharCount);
+            
+            // تحديث عداد الأحرف في البداية
+            updateCharCount();
+            
+            // تحذير قبل إغلاق الصفحة
+            window.addEventListener('beforeunload', function(e) {
+                if (currentEmployee && (orderStarted || 
+                    document.getElementById('orderDetails').value.trim() || 
+                    document.getElementById('senderName').value.trim())) {
+                    e.preventDefault();
+                    e.returnValue = 'هل أنت متأكد من إغلاق الصفحة؟ سيتم فقدان البيانات غير المحفوظة.';
+                }
+            });
+        });
     </script>
 </body>
 </html>
