@@ -3,35 +3,44 @@ const { Pool } = require('pg');
 // إعداد الاتصال بقاعدة البيانات
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+    ssl: { rejectUnauthorized: false },
     max: 20,
     idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 2000,
+    connectionTimeoutMillis: 10000,
 });
 
-export default async function handler(req, res) {
-    // إعداد CORS
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    
-    if (req.method === 'OPTIONS') {
-        res.status(200).end();
-        return;
+exports.handler = async (event, context) => {
+    const headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+    };
+
+    if (event.httpMethod === 'OPTIONS') {
+        return { statusCode: 200, headers, body: '' };
     }
 
-    if (req.method !== 'GET') {
-        return res.status(405).json({ success: false, message: 'Method not allowed' });
+    if (event.httpMethod !== 'GET') {
+        return {
+            statusCode: 405,
+            headers,
+            body: JSON.stringify({ success: false, message: 'Method not allowed' })
+        };
     }
 
     try {
-        const { employeeId } = req.query;
+        // استخراج employeeId من query parameters
+        const { employeeId } = event.queryStringParameters || {};
         
         if (!employeeId) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'معرف الموظف مطلوب' 
-            });
+            return {
+                statusCode: 400,
+                headers,
+                body: JSON.stringify({ 
+                    success: false, 
+                    message: 'معرف الموظف مطلوب' 
+                })
+            };
         }
 
         const today = new Date().toISOString().split('T')[0];
@@ -66,26 +75,34 @@ export default async function handler(req, res) {
             LIMIT 5
         `, [employeeId]);
 
-        res.json({
-            success: true,
-            todayStats: todayResult.rows[0] || { 
-                total_orders: 0, 
-                completed_orders: 0, 
-                incomplete_orders: 0 
-            },
-            totalStats: totalResult.rows[0] || {
-                total_orders: 0,
-                completed_orders: 0,
-                incomplete_orders: 0
-            },
-            recentOrders: recentResult.rows
-        });
+        return {
+            statusCode: 200,
+            headers,
+            body: JSON.stringify({
+                success: true,
+                todayStats: todayResult.rows[0] || { 
+                    total_orders: 0, 
+                    completed_orders: 0, 
+                    incomplete_orders: 0 
+                },
+                totalStats: totalResult.rows[0] || {
+                    total_orders: 0,
+                    completed_orders: 0,
+                    incomplete_orders: 0
+                },
+                recentOrders: recentResult.rows
+            })
+        };
 
     } catch (error) {
         console.error('خطأ في جلب الإحصائيات:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'خطأ في جلب الإحصائيات: ' + error.message 
-        });
+        return {
+            statusCode: 500,
+            headers,
+            body: JSON.stringify({ 
+                success: false, 
+                message: 'خطأ في جلب الإحصائيات: ' + error.message 
+            })
+        };
     }
-}
+};
