@@ -1,6 +1,5 @@
 const { Pool } = require('pg');
 
-// إعداد الاتصال بقاعدة البيانات
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false },
