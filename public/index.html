@@ -429,7 +429,7 @@
     </div>
 
     <script>
-        // إعداد API - سيتم تحديثه تلقائياً على Vercel
+        // إعداد API
         const API_BASE_URL = '/api';
         
         // متغيرات عامة
@@ -440,7 +440,6 @@
         let orderStarted = false;
         let orderStartTime = null;
         let timerInterval = null;
-        let connectionCheckInterval = null;
         
         // مراقبة حالة الاتصال
         function checkConnection() {
@@ -460,7 +459,7 @@
             }
         }
         
-        // دالة مساعدة للطلبات HTTP مع معالجة الأخطاء
+        // دالة مساعدة للطلبات HTTP
         async function makeRequest(url, options = {}) {
             try {
                 const response = await fetch(url, {
@@ -485,7 +484,6 @@
             } catch (error) {
                 console.error('خطأ في الطلب:', error);
                 
-                // معالجة أخطاء الاتصال
                 if (error.name === 'TypeError' && error.message.includes('fetch')) {
                     throw new Error('خطأ في الاتصال بالخادم');
                 }
