@@ -30,6 +30,19 @@ exports.handler = async (event, context) => {
     try {
         console.log('Starting login process...');
         
+        // التحقق من وجود DATABASE_URL
+        if (!process.env.DATABASE_URL) {
+            console.error('DATABASE_URL environment variable not found');
+            return {
+                statusCode: 500,
+                headers,
+                body: JSON.stringify({ 
+                    success: false, 
+                    message: 'خطأ في إعداد قاعدة البيانات' 
+                })
+            };
+        }
+
         if (!event.body) {
             return {
                 statusCode: 400,
@@ -41,7 +54,22 @@ exports.handler = async (event, context) => {
             };
         }
 
-        const { username, password } = JSON.parse(event.body);
+        let requestData;
+        try {
+            requestData = JSON.parse(event.body);
+        } catch (parseError) {
+            console.error('JSON parse error:', parseError);
+            return {
+                statusCode: 400,
+                headers,
+                body: JSON.stringify({ 
+                    success: false, 
+                    message: 'بيانات غير صالحة' 
+                })
+            };
+        }
+
+        const { username, password } = requestData;
         console.log('Login attempt for username:', username);
         
         if (!username || !password) {
@@ -58,13 +86,39 @@ exports.handler = async (event, context) => {
         console.log('Connecting to database...');
         
         // التحقق من الاتصال بقاعدة البيانات
-        const testQuery = await pool.query('SELECT NOW()');
-        console.log('Database connection successful:', testQuery.rows[0]);
+        try {
+            const testQuery = await pool.query('SELECT NOW()');
+            console.log('Database connection successful:', testQuery.rows[0]);
+        } catch (dbError) {
+            console.error('Database connection failed:', dbError);
+            return {
+                statusCode: 500,
+                headers,
+                body: JSON.stringify({ 
+                    success: false, 
+                    message: 'خطأ في الاتصال بقاعدة البيانات' 
+                })
+            };
+        }
 
-        const result = await pool.query(
-            'SELECT * FROM employees WHERE username = $1 AND is_active = TRUE',
-            [username]
-        );
+        // البحث عن الموظف
+        let result;
+        try {
+            result = await pool.query(
+                'SELECT * FROM employees WHERE username = $1 AND is_active = TRUE',
+                [username]
+            );
+        } catch (queryError) {
+            console.error('Employee query error:', queryError);
+            return {
+                statusCode: 500,
+                headers,
+                body: JSON.stringify({ 
+                    success: false, 
+                    message: 'خطأ في البحث عن بيانات الموظف' 
+                })
+            };
+        }
 
         console.log('Query result:', result.rows.length, 'rows found');
 
