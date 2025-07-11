@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة إدارة الطلبات - نظام المراسلين</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles/admin-dashboard.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="fas fa-chart-line"></i> لوحة إدارة الطلبات</h1>
+            <p style="text-align: center; color: #718096; margin-top: 10px;">
+                مراقبة وإدارة طلبات المراسلين في الوقت الفعلي
+            </p>
+            <button class="btn btn-primary export-btn" onclick="exportToExcel()">
+                <i class="fas fa-download"></i> تصدير إلى Excel
+            </button>
+            <a href="index.html" class="btn btn-secondary" style="position: absolute; top: 20px; right: 20px;">
+                <i class="fas fa-home"></i> الرئيسية
+            </a>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #48bb78;">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-value" id="completedOrders">0</div>
+                <div class="stat-label">طلبات مكتملة</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #ed8936;">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-value" id="pendingOrders">0</div>
+                <div class="stat-label">طلبات قيد التنفيذ</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #f56565;">
+                    <i class="fas fa-times-circle"></i>
+                </div>
+                <div class="stat-value" id="cancelledOrders">0</div>
+                <div class="stat-label">طلبات ملغية</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #4299e1;">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-value" id="activeMessengers">0</div>
+                <div class="stat-label">مراسلين نشطين</div>
+            </div>
+        </div>
+
+        <!-- Search and Filters -->
+        <div class="filters">
+            <input type="text" id="searchInput" placeholder="البحث في الطلبات..." class="search-input">
+            
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label>حالة الطلب</label>
+                    <select id="statusFilter">
+                        <option value="">جميع الحالات</option>
+                        <option value="completed">مكتمل</option>
+                        <option value="pending">قيد التنفيذ</option>
+                        <option value="in_transit">في الطريق</option>
+                        <option value="cancelled">ملغي</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label>المراسل</label>
+                    <select id="messengerFilter">
+                        <option value="">جميع المراسلين</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label>من تاريخ</label>
+                    <input type="date" id="dateFrom">
+                </div>
+                
+                <div class="filter-group">
+                    <label>إلى تاريخ</label>
+                    <input type="date" id="dateTo">
+                </div>
+                
+                <div class="filter-group">
+                    <button class="btn btn-primary" onclick="applyFilters()">
+                        <i class="fas fa-filter"></i> تطبيق الفلاتر
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearFilters()">
+                        <i class="fas fa-times"></i> مسح الفلاتر
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>جاري تحميل البيانات...</p>
+        </div>
+
+        <!-- Orders Grid -->
+        <div class="orders-grid" id="ordersGrid">
+            <!-- Orders will be dynamically loaded here -->
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" id="pagination">
+            <!-- Pagination will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Order Details Modal -->
+    <div class="modal" id="orderModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+                <h2 id="modalTitle">تفاصيل الطلب</h2>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Modal content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/admin-dashboard.js"></script>
+</body>
+</html>
+
+        <!-- Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #48bb78;">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-value" id="completedOrders">0</div>
+                <div class="stat-label">طلبات مكتملة</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #ed8936;">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-value" id="pendingOrders">0</div>
+                <div class="stat-label">طلبات قيد التنفيذ</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #f56565;">
+                    <i class="fas fa-times-circle"></i>
+                </div>
+                <div class="stat-value" id="cancelledOrders">0</div>
+                <div class="stat-label">طلبات ملغية</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #4299e1;">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-value" id="activeMessengers">0</div>
+                <div class="stat-label">مراسلين نشطين</div>
+            </div>
+        </div>
+
+        <!-- Search and Filters -->
+        <div class="filters">
+            <input type="text" id="searchInput" placeholder="البحث في الطلبات..." class="search-input">
+            
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label>حالة الطلب</label>
+                    <select id="statusFilter">
+                        <option value="">جميع الحالات</option>
+                        <option value="completed">مكتمل</option>
+                        <option value="pending">قيد التنفيذ</option>
+                        <option value="in_transit">في الطريق</option>
+                        <option value="cancelled">ملغي</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label>المراسل</label>
+                    <select id="messengerFilter">
+                        <option value="">جميع المراسلين</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label>من تاريخ</label>
+                    <input type="date" id="dateFrom">
+                </div>
+                
+                <div class="filter-group">
+                    <label>إلى تاريخ</label>
+                    <input type="date" id="dateTo">
+                </div>
+                
+                <div class="filter-group">
+                    <button class="btn btn-primary" onclick="applyFilters()">
+                        <i class="fas fa-filter"></i> تطبيق الفلاتر
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearFilters()">
+                        <i class="fas fa-times"></i> مسح الفلاتر
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>جاري تحميل البيانات...</p>
+        </div>
+
+        <!-- Orders Grid -->
+        <div class="orders-grid" id="ordersGrid">
+            <!-- Orders will be dynamically loaded here -->
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" id="pagination">
+            <!-- Pagination will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Order Details Modal -->
+    <div class="modal" id="orderModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+                <h2 id="modalTitle">تفاصيل الطلب</h2>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Modal content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/admin-dashboard.js"></script>
+</body>
+</html>
