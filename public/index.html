@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة طلبات التصوير</title>
+    <title>نظام تسجيل أوردرات الموظفين</title>
     <style>
         * {
             margin: 0;
@@ -23,408 +23,1019 @@
 
         .container {
             background: white;
+            padding: 30px;
             border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
             width: 100%;
-            max-width: 900px;
-        }
-
-        .hero {
-            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
-            color: white;
-            padding: 60px 40px;
+            max-width: 600px;
             text-align: center;
+            position: relative;
+            overflow: hidden;
         }
 
-        .hero h1 {
-            font-size: 3rem;
-            margin-bottom: 20px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
         }
 
-        .hero p {
-            font-size: 1.3rem;
-            opacity: 0.9;
+        h1 {
+            color: #333;
             margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        .hero-icons {
-            font-size: 4rem;
+        .form-group {
             margin-bottom: 20px;
+            text-align: right;
         }
 
-        .content {
-            padding: 50px 40px;
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 14px;
         }
 
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-            margin-bottom: 50px;
-        }
-
-        .feature {
-            text-align: center;
-            padding: 30px 20px;
-            border-radius: 15px;
+        select, input, textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
             background: #f8f9fa;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        .feature:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        select:focus, input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
         }
 
-        .feature-icon {
-            font-size: 3rem;
-            margin-bottom: 20px;
-            color: #3498db;
-        }
-
-        .feature h3 {
-            color: #2c3e50;
-            margin-bottom: 15px;
-            font-size: 1.3rem;
-        }
-
-        .feature p {
-            color: #7f8c8d;
-            line-height: 1.6;
-        }
-
-        .actions {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .btn {
+        button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
             padding: 15px 30px;
             border: none;
             border-radius: 12px;
-            font-size: 1.1rem;
-            font-weight: bold;
+            font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
             transition: all 0.3s ease;
-            text-align: center;
-            min-width: 200px;
+            margin: 10px 5px;
+            min-width: 120px;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-            color: white;
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
         }
 
-        .btn-secondary {
-            background: linear-gradient(135deg, #27ae60 0%, #219a52 100%);
-            color: white;
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        .secondary-btn {
+            background: #6c757d;
         }
 
-        .stats {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            padding: 40px;
-            margin: 40px 0;
+        .secondary-btn:hover:not(:disabled) {
+            background: #545b62;
+        }
+
+        .danger-btn {
+            background: linear-gradient(45deg, #dc3545, #c82333);
+        }
+
+        .danger-btn:hover:not(:disabled) {
+            box-shadow: 0 8px 25px rgba(220, 53, 69, 0.3);
+        }
+
+        .camera-container {
+            position: relative;
+            margin: 20px 0;
             border-radius: 15px;
+            overflow: hidden;
+            border: 3px solid #e1e5e9;
         }
 
-        .stats h3 {
-            text-align: center;
-            color: #2c3e50;
-            margin-bottom: 30px;
-            font-size: 1.5rem;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-        }
-
-        .stat-item {
-            text-align: center;
-            background: white;
-            padding: 25px 20px;
+        video, canvas {
+            width: 100%;
+            max-width: 400px;
             border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: block;
         }
 
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #3498db;
+        .status {
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+            font-weight: 600;
+            font-size: 14px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .status.success {
+            background: linear-gradient(45deg, #d4edda, #c3e6cb);
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: linear-gradient(45deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.info {
+            background: linear-gradient(45deg, #d1ecf1, #bee5eb);
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .status.warning {
+            background: linear-gradient(45deg, #fff3cd, #ffeaa7);
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .location-info {
+            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+            font-size: 14px;
+            color: #666;
+            border: 1px solid #dee2e6;
+        }
+
+        .photo-preview {
+            max-width: 300px;
+            border-radius: 15px;
+            margin: 15px 0;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .login-section {
+            margin-bottom: 30px;
+        }
+
+        .order-section {
+            display: none;
+        }
+
+        .employee-info {
+            background: linear-gradient(45deg, #e8f5e8, #d4edda);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border: 2px solid #28a745;
+            color: #155724;
+        }
+
+        .employee-info h3 {
+            margin-bottom: 8px;
+            font-size: 20px;
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .stats-card {
+            background: linear-gradient(45deg, #e3f2fd, #bbdefb);
+            border: 1px solid #90caf9;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 10px 0;
+            color: #0d47a1;
+            font-size: 14px;
+        }
+
+        .order-history {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 20px 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .order-history h4 {
             margin-bottom: 10px;
+            color: #495057;
         }
 
-        .stat-label {
-            color: #7f8c8d;
-            font-size: 0.9rem;
+        .order-item {
+            background: white;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            font-size: 12px;
         }
 
-        .footer {
-            background: #2c3e50;
-            color: white;
-            text-align: center;
-            padding: 30px;
+        .character-count {
+            text-align: left;
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 5px;
         }
 
-        .footer p {
-            opacity: 0.8;
-            margin-bottom: 10px;
-        }
-
-        @media (max-width: 768px) {
-            .hero {
-                padding: 40px 20px;
-            }
-
-            .hero h1 {
-                font-size: 2rem;
-            }
-
-            .hero p {
-                font-size: 1.1rem;
-            }
-
-            .content {
-                padding: 30px 20px;
-            }
-
-            .features {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-
-            .actions {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .btn {
-                width: 100%;
-                max-width: 300px;
-            }
-        }
-
-        .notification {
+        .connection-status {
             position: fixed;
             top: 20px;
             right: 20px;
-            padding: 15px 20px;
-            background: #27ae60;
+            background: rgba(0,0,0,0.8);
             color: white;
+            padding: 10px 15px;
             border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            font-size: 12px;
             z-index: 1000;
-            font-weight: bold;
             display: none;
+        }
+
+        .connection-status.online {
+            background: rgba(40, 167, 69, 0.9);
+        }
+
+        .connection-status.offline {
+            background: rgba(220, 53, 69, 0.9);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            h1 {
+                font-size: 22px;
+            }
+            
+            button {
+                padding: 12px 20px;
+                font-size: 14px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="hero">
-            <div class="hero-icons">🎬 📱 📊</div>
-            <h1>نظام إدارة طلبات التصوير</h1>
-            <p>منصة شاملة لإدارة طلبات التصوير للمراسلين مع تفاصيل كاملة وتصدير البيانات</p>
+        <h1>نظام تسجيل أوردرات الموظفين</h1>
+        
+        <!-- قسم تسجيل الدخول -->
+        <div class="login-section" id="loginSection">
+            <div class="form-group">
+                <label for="username">اسم المستخدم:</label>
+                <input type="text" id="username" placeholder="أدخل اسم المستخدم" autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label for="password">كلمة المرور:</label>
+                <input type="password" id="password" placeholder="أدخل كلمة المرور" autocomplete="current-password">
+            </div>
+            <button onclick="login()">تسجيل الدخول</button>
+            <div id="loginError" class="status error hidden"></div>
         </div>
 
-        <div class="content">
-            <div class="features">
-                <div class="feature">
-                    <div class="feature-icon">📋</div>
-                    <h3>إدارة الطلبات</h3>
-                    <p>إنشاء ومتابعة طلبات التصوير مع تفاصيل شاملة للموقع والمعدات المطلوبة</p>
-                </div>
-                <div class="feature">
-                    <div class="feature-icon">📸</div>
-                    <h3>رفع الوسائط</h3>
-                    <p>رفع الصور والفيديوهات مع معاينة فورية وإدارة متقدمة للملفات</p>
-                </div>
-                <div class="feature">
-                    <div class="feature-icon">📊</div>
-                    <h3>تصدير البيانات</h3>
-                    <p>تصدير تقارير مفصلة بصيغة Excel مع فلترة حسب التاريخ والحالة</p>
-                </div>
-                <div class="feature">
-                    <div class="feature-icon">🗺️</div>
-                    <h3>تتبع المواقع</h3>
-                    <p>عرض المواقع على الخريطة مع الإحداثيات الدقيقة لكل طلب تصوير</p>
+        <!-- قسم تسجيل الأوردر -->
+        <div class="order-section" id="orderSection">
+            <div class="employee-info" id="employeeInfo">
+                <h3>مرحباً، <span id="employeeName"></span></h3>
+                <p>رقم الموظف: <span id="employeeId"></span></p>
+                <p>آخر تسجيل دخول: <span id="lastLogin"></span></p>
+            </div>
+
+            <div class="stats-card">
+                <strong>إحصائيات اليوم:</strong>
+                <div>الأوردرات المسجلة: <span id="todayOrders">0</span></div>
+                <div>آخر أوردر: <span id="lastOrderTime">لا يوجد</span></div>
+                <div id="currentOrderTimer" class="hidden" style="color: #667eea; font-weight: bold;">
+                    ⏱️ الأوردر الحالي: <span id="timerDisplay">00:00</span>
                 </div>
             </div>
 
-            <div class="stats">
-                <h3>📈 إحصائيات النظام</h3>
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <div class="stat-number" id="totalOrders">150+</div>
-                        <div class="stat-label">إجمالي الطلبات</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number" id="activeEmployees">25+</div>
-                        <div class="stat-label">مراسل نشط</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number" id="completedOrders">120+</div>
-                        <div class="stat-label">طلب مكتمل</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number" id="mediaFiles">500+</div>
-                        <div class="stat-label">ملف وسائط</div>
-                    </div>
+            <div class="form-group">
+                <label for="orderType">نوع الأوردر:</label>
+                <select id="orderType">
+                    <option value="">اختر نوع الأوردر</option>
+                    <option value="استطلاع">استطلاع</option>
+                    <option value="ريلز">ريلز</option>
+                    <option value="معالم">معالم</option>
+                    <option value="قصة">قصة</option>
+                    <option value="وثائقي">وثائقي</option>
+                    <option value="فوتو">فوتو</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="orderDetails">تفاصيل الأوردر:</label>
+                <textarea id="orderDetails" rows="4" placeholder="اكتب تفاصيل الأوردر هنا..."></textarea>
+                <div class="character-count">
+                    <span id="charCount">0</span> حرف
                 </div>
             </div>
 
-            <div class="actions">
-                <a href="login.html" class="btn btn-primary">
-                    👨‍💼 دخول المراسلين
-                </a>
-                <a href="admin.html" class="btn btn-secondary">
-                    🛠️ لوحة الإدارة
-                </a>
+            <div class="form-group">
+                <label for="senderName">اسم المراسل أو المقدم:</label>
+                <input type="text" id="senderName" placeholder="اسم المراسل أو المقدم">
+            </div>
+
+            <div class="button-group">
+                <button onclick="getLocationManually()" id="locationBtn" class="secondary-btn">تحديد الموقع الحالي</button>
+            </div>
+            
+            <div class="location-info hidden" id="locationInfo">
+                <strong>الموقع المحدد:</strong> 
+                <span id="locationText">لم يتم تحديد الموقع بعد</span>
+                <div id="locationAccuracy" class="hidden">
+                    دقة الموقع: <span id="accuracyText"></span> متر
+                </div>
+            </div>
+
+            <div class="camera-container">
+                <video id="camera" autoplay playsinline class="hidden"></video>
+                <canvas id="canvas" class="hidden"></canvas>
+                <img id="photoPreview" class="photo-preview hidden" />
+            </div>
+
+            <div class="button-group">
+                <button onclick="startCamera()">تشغيل الكاميرا</button>
+                <button onclick="takePhoto()" id="takePhotoBtn" disabled>التقاط صورة</button>
+                <button onclick="retakePhoto()" id="retakePhotoBtn" class="secondary-btn hidden">التقاط مرة أخرى</button>
+            </div>
+
+            <div class="loading-spinner" id="loadingSpinner"></div>
+
+            <div class="button-group">
+                <button onclick="startOrder()" id="startOrderBtn">بدء الأوردر</button>
+                <button onclick="completeOrder()" id="completeOrderBtn" disabled>إكمال الأوردر</button>
+                <button onclick="showIncompleteDialog()" id="incompleteOrderBtn" class="danger-btn" disabled>لم يكتمل الأوردر</button>
+                <button onclick="logout()" class="secondary-btn">تسجيل الخروج</button>
+            </div>
+
+            <div class="order-history hidden" id="orderHistory">
+                <h4>الأوردرات الأخيرة</h4>
+                <div id="orderHistoryList"></div>
             </div>
         </div>
 
-        <div class="footer">
-            <p>© 2024 نظام إدارة طلبات التصوير</p>
-            <p>تم تطويره بأحدث التقنيات لخدمة المراسلين والإعلاميين</p>
-        </div>
+        <div id="status" class="status hidden"></div>
     </div>
 
-    <div id="notification" class="notification">
-        مرحباً بك في نظام إدارة طلبات التصوير!
+    <!-- مؤشر حالة الاتصال -->
+    <div id="connectionStatus" class="connection-status">
+        <span id="connectionText">جاري التحقق من الاتصال...</span>
     </div>
 
     <script>
-        // عرض إشعار الترحيب
-        document.addEventListener('DOMContentLoaded', function() {
-            const notification = document.getElementById('notification');
-            notification.style.display = 'block';
+        // إعداد API
+        const API_BASE_URL = '/api';
+        
+        // متغيرات عامة
+        let currentEmployee = null;
+        let currentLocation = null;
+        let photoData = null;
+        let camera = null;
+        let orderStarted = false;
+        let orderStartTime = null;
+        let timerInterval = null;
+        
+        // مراقبة حالة الاتصال
+        function checkConnection() {
+            const statusElement = document.getElementById('connectionStatus');
+            const textElement = document.getElementById('connectionText');
             
-            setTimeout(() => {
-                notification.style.display = 'none';
-            }, 3000);
-
-            // تحديث الإحصائيات بشكل تدريجي
-            animateStats();
-        });
-
-        // تحريك الأرقام في الإحصائيات
-        function animateStats() {
-            const stats = [
-                { id: 'totalOrders', target: 150, suffix: '+' },
-                { id: 'activeEmployees', target: 25, suffix: '+' },
-                { id: 'completedOrders', target: 120, suffix: '+' },
-                { id: 'mediaFiles', target: 500, suffix: '+' }
-            ];
-
-            stats.forEach(stat => {
-                animateNumber(stat.id, stat.target, stat.suffix);
-            });
+            if (navigator.onLine) {
+                statusElement.className = 'connection-status online';
+                textElement.textContent = 'متصل';
+                setTimeout(() => {
+                    statusElement.style.display = 'none';
+                }, 2000);
+            } else {
+                statusElement.className = 'connection-status offline';
+                textElement.textContent = 'غير متصل';
+                statusElement.style.display = 'block';
+            }
         }
-
-        function animateNumber(elementId, target, suffix = '') {
-            const element = document.getElementById(elementId);
-            const duration = 2000; // مدة التحريك بالميلي ثانية
-            const increment = target / (duration / 16); // 60 FPS
-            let current = 0;
-
-            const timer = setInterval(() => {
-                current += increment;
-                if (current >= target) {
-                    current = target;
-                    clearInterval(timer);
+        
+        // دالة مساعدة للطلبات HTTP
+        async function makeRequest(url, options = {}) {
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    },
+                    ...options
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                element.textContent = Math.floor(current) + suffix;
-            }, 16);
-        }
-
-        // إضافة تأثيرات تفاعلية للأزرار
-        document.querySelectorAll('.btn').forEach(btn => {
-            btn.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateY(-3px) scale(1.02)';
-            });
-
-            btn.addEventListener('mouseleave', function() {
-                this.style.transform = 'translateY(0) scale(1)';
-            });
-        });
-
-        // تحقق من حالة الجلسة النشطة
-        function checkActiveSession() {
-            const session = localStorage.getItem('userSession');
-            if (session) {
-                try {
-                    const sessionData = JSON.parse(session);
-                    const now = new Date();
-                    const expiresAt = new Date(sessionData.expiresAt);
-
-                    if (now < expiresAt) {
-                        // إظهار إشعار للمستخدم المتصل
-                        const notification = document.getElementById('notification');
-                        notification.textContent = `مرحباً ${sessionData.user.name}! لديك جلسة نشطة.`;
-                        notification.style.background = '#3498db';
-                        notification.style.display = 'block';
-                        
-                        setTimeout(() => {
-                            notification.style.display = 'none';
-                        }, 5000);
-
-                        // تحديث أزرار التنقل
-                        updateNavigationForLoggedUser(sessionData.user);
-                    } else {
-                        // انتهت صلاحية الجلسة
-                        localStorage.removeItem('userSession');
-                    }
-                } catch (error) {
-                    // بيانات جلسة تالفة
-                    localStorage.removeItem('userSession');
+                
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.message || 'حدث خطأ في الطلب');
                 }
+                
+                return data;
+            } catch (error) {
+                console.error('خطأ في الطلب:', error);
+                
+                if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    throw new Error('خطأ في الاتصال بالخادم');
+                }
+                
+                throw error;
             }
         }
 
-        // تحديث أزرار التنقل للمستخدم المتصل
-        function updateNavigationForLoggedUser(user) {
-            const actionsDiv = document.querySelector('.actions');
-            if (user.role === 'admin') {
-                actionsDiv.innerHTML = `
-                    <a href="admin.html" class="btn btn-secondary">
-                        🛠️ لوحة الإدارة
-                    </a>
-                    <button onclick="logout()" class="btn" style="background: #e74c3c; color: white;">
-                        🚪 تسجيل الخروج
-                    </button>
-                `;
-            } else {
-                actionsDiv.innerHTML = `
-                    <a href="employee-dashboard.html" class="btn btn-primary">
-                        👨‍💼 لوحة المراسل
-                    </a>
-                    <button onclick="logout()" class="btn" style="background: #e74c3c; color: white;">
-                        🚪 تسجيل الخروج
-                    </button>
-                `;
+        // تسجيل الدخول
+        async function login() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            if (!username || !password) {
+                showLoginError('يرجى إدخال اسم المستخدم وكلمة المرور');
+                return;
+            }
+
+            try {
+                showStatus('جاري تسجيل الدخول...', 'info');
+                
+                const result = await makeRequest(`${API_BASE_URL}/login-supabase`, {
+                    method: 'POST',
+                    body: JSON.stringify({ username, password })
+                });
+
+                currentEmployee = result.employee;
+                
+                // تحديث الواجهة
+                document.getElementById('employeeName').textContent = currentEmployee.name;
+                document.getElementById('employeeId').textContent = currentEmployee.employee_id;
+                document.getElementById('lastLogin').textContent = currentEmployee.lastLogin;
+                document.getElementById('todayOrders').textContent = currentEmployee.todayOrders;
+                
+                // إخفاء قسم تسجيل الدخول وإظهار قسم الأوردر
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('orderSection').style.display = 'block';
+                document.getElementById('loginError').classList.add('hidden');
+                
+                // تحميل الإحصائيات
+                await loadEmployeeStats();
+                
+                showStatus('تم تسجيل الدخول بنجاح', 'success');
+                
+            } catch (error) {
+                showLoginError(error.message);
+            }
+        }
+
+        // تحميل إحصائيات الموظف
+        async function loadEmployeeStats() {
+            try {
+                const result = await makeRequest(`${API_BASE_URL}/employee-stats-supabase?employeeId=${currentEmployee.id}`);
+                
+                // تحديث الإحصائيات
+                document.getElementById('todayOrders').textContent = result.todayStats.total_orders;
+                
+                // تحديث السجل
+                updateOrderHistoryDisplay(result.recentOrders);
+                
+            } catch (error) {
+                console.error('خطأ في تحميل الإحصائيات:', error);
+            }
+        }
+
+        // حفظ الأوردر
+        async function saveOrder(orderData) {
+            try {
+                showStatus('جاري حفظ الأوردر...', 'info');
+                document.getElementById('loadingSpinner').style.display = 'block';
+                
+                const result = await makeRequest(`${API_BASE_URL}/save-order-supabase`, {
+                    method: 'POST',
+                    body: JSON.stringify(orderData)
+                });
+                
+                showStatus('تم حفظ الأوردر بنجاح!', 'success');
+                
+                // تحديث الإحصائيات
+                currentEmployee.todayOrders++;
+                document.getElementById('todayOrders').textContent = currentEmployee.todayOrders;
+                document.getElementById('lastOrderTime').textContent = new Date().toLocaleTimeString('en-GB');
+                
+                // إعادة تحميل الإحصائيات
+                await loadEmployeeStats();
+                
+                resetForm();
+                
+            } catch (error) {
+                showStatus('خطأ في حفظ الأوردر: ' + error.message, 'error');
+            } finally {
+                document.getElementById('loadingSpinner').style.display = 'none';
             }
         }
 
         // تسجيل الخروج
-        function logout() {
-            localStorage.removeItem('userSession');
-            location.reload();
+        async function logout() {
+            try {
+                if (currentEmployee) {
+                    await makeRequest(`${API_BASE_URL}/logout`, {
+                        method: 'POST',
+                        body: JSON.stringify({ employeeId: currentEmployee.id })
+                    });
+                }
+                
+                // إعادة تعيين المتغيرات
+                currentEmployee = null;
+                currentLocation = null;
+                photoData = null;
+                orderStarted = false;
+                orderStartTime = null;
+                
+                // إيقاف الكاميرا
+                if (camera) {
+                    camera.getTracks().forEach(track => track.stop());
+                    camera = null;
+                }
+                
+                // إيقاف العداد
+                stopOrderTimer();
+                
+                // إعادة تعيين الواجهة
+                document.getElementById('loginSection').style.display = 'block';
+                document.getElementById('orderSection').style.display = 'none';
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
+                document.getElementById('loginError').classList.add('hidden');
+                
+                resetForm();
+                showStatus('تم تسجيل الخروج', 'info');
+                
+            } catch (error) {
+                console.error('خطأ في تسجيل الخروج:', error);
+            }
         }
 
-        // فحص الجلسة عند تحميل الصفحة
-        checkActiveSession();
+        // تحديد الموقع يدوياً
+        function getLocationManually() {
+            document.getElementById('locationBtn').disabled = true;
+            document.getElementById('locationBtn').textContent = 'جاري تحديد الموقع...';
+            
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        currentLocation = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                            accuracy: position.coords.accuracy
+                        };
+                        
+                        document.getElementById('locationText').textContent = 
+                            `خط العرض: ${currentLocation.latitude.toFixed(6)}, خط الطول: ${currentLocation.longitude.toFixed(6)}`;
+                        
+                        document.getElementById('accuracyText').textContent = Math.round(currentLocation.accuracy);
+                        document.getElementById('locationAccuracy').classList.remove('hidden');
+                        document.getElementById('locationInfo').classList.remove('hidden');
+                        
+                        document.getElementById('locationBtn').disabled = false;
+                        document.getElementById('locationBtn').textContent = 'تم تحديد الموقع ✓';
+                        document.getElementById('locationBtn').style.background = 'linear-gradient(45deg, #28a745, #20c997)';
+                        
+                        showStatus('تم تحديد الموقع بنجاح', 'success');
+                    },
+                    (error) => {
+                        document.getElementById('locationBtn').disabled = false;
+                        document.getElementById('locationBtn').textContent = 'تحديد الموقع الحالي';
+                        
+                        let errorMessage = 'فشل في تحديد الموقع';
+                        switch(error.code) {
+                            case error.PERMISSION_DENIED:
+                                errorMessage = 'قم بتفعيل موقعك في إعدادات المتصفح للمتابعة';
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                errorMessage = 'موقعك غير متاح حالياً';
+                                break;
+                            case error.TIMEOUT:
+                                errorMessage = 'انتهت مهلة تحديد الموقع - حاول مرة أخرى';
+                                break;
+                        }
+                        
+                        showStatus(errorMessage, 'error');
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 15000,
+                        maximumAge: 300000
+                    }
+                );
+            } else {
+                document.getElementById('locationBtn').disabled = false;
+                document.getElementById('locationBtn').textContent = 'تحديد الموقع الحالي';
+                showStatus('المتصفح لا يدعم تحديد الموقع', 'error');
+            }
+        }
+
+        // تشغيل الكاميرا
+        async function startCamera() {
+            try {
+                const video = document.getElementById('camera');
+                camera = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        facingMode: 'user',
+                        width: { ideal: 640 },
+                        height: { ideal: 480 }
+                    } 
+                });
+                
+                video.srcObject = camera;
+                video.classList.remove('hidden');
+                
+                document.getElementById('takePhotoBtn').disabled = false;
+                showStatus('تم تشغيل الكاميرا', 'success');
+            } catch (error) {
+                showStatus('خطأ في تشغيل الكاميرا: ' + error.message, 'error');
+            }
+        }
+
+        // التقاط الصورة
+        function takePhoto() {
+            const video = document.getElementById('camera');
+            const canvas = document.getElementById('canvas');
+            const preview = document.getElementById('photoPreview');
+            
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0);
+            
+            photoData = canvas.toDataURL('image/jpeg', 0.8);
+            
+            preview.src = photoData;
+            preview.classList.remove('hidden');
+            video.classList.add('hidden');
+            
+            document.getElementById('completeOrderBtn').disabled = false;
+            document.getElementById('retakePhotoBtn').classList.remove('hidden');
+            document.getElementById('takePhotoBtn').disabled = true;
+            
+            showStatus('تم التقاط الصورة', 'success');
+        }
+
+        // إعادة التقاط الصورة
+        function retakePhoto() {
+            const video = document.getElementById('camera');
+            const preview = document.getElementById('photoPreview');
+            
+            preview.classList.add('hidden');
+            video.classList.remove('hidden');
+            
+            document.getElementById('retakePhotoBtn').classList.add('hidden');
+            document.getElementById('takePhotoBtn').disabled = false;
+            document.getElementById('completeOrderBtn').disabled = true;
+            
+            photoData = null;
+            showStatus('يمكنك التقاط صورة جديدة', 'info');
+        }
+
+        // بدء الأوردر
+        function startOrder() {
+            orderStarted = true;
+            orderStartTime = new Date();
+            
+            document.getElementById('startOrderBtn').disabled = true;
+            document.getElementById('startOrderBtn').textContent = 'تم بدء الأوردر ✓';
+            document.getElementById('startOrderBtn').style.background = 'linear-gradient(45deg, #28a745, #20c997)';
+            
+            document.getElementById('completeOrderBtn').disabled = false;
+            document.getElementById('incompleteOrderBtn').disabled = false;
+            
+            document.getElementById('currentOrderTimer').classList.remove('hidden');
+            startOrderTimer();
+            
+            showStatus(`تم بدء الأوردر - الوقت: ${orderStartTime.toLocaleTimeString('en-GB')}`, 'success');
+        }
+
+        // بدء العداد الزمني للأوردر
+        function startOrderTimer() {
+            timerInterval = setInterval(() => {
+                if (orderStartTime) {
+                    const now = new Date();
+                    const diff = now.getTime() - orderStartTime.getTime();
+                    const minutes = Math.floor(diff / 60000);
+                    const seconds = Math.floor((diff % 60000) / 1000);
+                    
+                    const timerDisplay = document.getElementById('timerDisplay');
+                    timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                }
+            }, 1000);
+        }
+
+        // إيقاف العداد الزمني
+        function stopOrderTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            document.getElementById('currentOrderTimer').classList.add('hidden');
+        }
+
+        // حساب مدة الأوردر
+        function calculateOrderDuration() {
+            if (!orderStartTime) return null;
+            
+            const endTime = new Date();
+            const durationMs = endTime.getTime() - orderStartTime.getTime();
+            const durationMinutes = Math.floor(durationMs / 60000);
+            const durationSeconds = Math.floor((durationMs % 60000) / 1000);
+            
+            return {
+                startTime: orderStartTime.toLocaleTimeString('en-GB'),
+                endTime: endTime.toLocaleTimeString('en-GB'),
+                durationMs: durationMs,
+                durationText: `${durationMinutes} دقيقة و ${durationSeconds} ثانية`
+            };
+        }
+
+        // التحقق من صحة البيانات
+        function validateOrder() {
+            const orderType = document.getElementById('orderType').value;
+            const orderDetails = document.getElementById('orderDetails').value.trim();
+            const senderName = document.getElementById('senderName').value.trim();
+            
+            if (!orderStarted) {
+                showStatus('يرجى الضغط على "بدء الأوردر" أولاً', 'error');
+                return false;
+            }
+            
+            if (!orderType) {
+                showStatus('يرجى اختيار نوع الأوردر', 'error');
+                return false;
+            }
+            
+            if (!orderDetails) {
+                showStatus('يرجى إدخال تفاصيل الأوردر', 'error');
+                return false;
+            }
+            
+            if (orderDetails.length < 10) {
+                showStatus('تفاصيل الأوردر قصيرة جداً (الحد الأدنى 10 أحرف)', 'error');
+                return false;
+            }
+            
+            if (!senderName) {
+                showStatus('يرجى إدخال اسم المراسل', 'error');
+                return false;
+            }
+            
+            if (!photoData) {
+                showStatus('يرجى التقاط صورة', 'error');
+                return false;
+            }
+            
+            return true;
+        }
+
+        // إكمال الأوردر
+        async function completeOrder() {
+            if (!validateOrder()) {
+                return;
+            }
+            
+            const orderDuration = calculateOrderDuration();
+            
+            const orderData = {
+                employeeId: currentEmployee.id,
+                orderType: document.getElementById('orderType').value,
+                orderDetails: document.getElementById('orderDetails').value.trim(),
+                senderName: document.getElementById('senderName').value.trim(),
+                locationLatitude: currentLocation ? currentLocation.latitude : null,
+                locationLongitude: currentLocation ? currentLocation.longitude : null,
+                locationAccuracy: currentLocation ? currentLocation.accuracy : null,
+                photoData: photoData,
+                status: 'مكتمل',
+                sessionId: Date.now().toString(36) + Math.random().toString(36).substr(2),
+                orderStartTime: orderDuration ? orderDuration.startTime : null,
+                orderEndTime: orderDuration ? orderDuration.endTime : null,
+                orderDurationMs: orderDuration ? orderDuration.durationMs : null
+            };
+            
+            stopOrderTimer();
+            await saveOrder(orderData);
+        }
+
+        // عرض نافذة عدم الاكتمال
+        function showIncompleteDialog() {
+            const reason = prompt('لماذا لم يكتمل الأوردر؟\n\nاختر من الأسباب التالية أو اكتب سبب آخر:\n' +
+                '1. مشكلة في الكاميرا\n' +
+                '2. نفاذ شحن بطارية الكاميرا\n' +
+                '3. رفض المقدم التصوير\n' +
+                '4. مشكلة في تحديد الموقع\n' +
+                '5. ظروف طارئة\n' +
+                '6. أخرى (اكتب السبب)');
+            
+            if (reason && reason.trim()) {
+                submitIncompleteOrder(reason.trim());
+            }
+        }
+
+        // تسجيل الأوردر غير المكتمل
+        async function submitIncompleteOrder(reason) {
+            const orderDuration = calculateOrderDuration();
+
+            const incompleteData = {
+                employeeId: currentEmployee.id,
+                orderType: document.getElementById('orderType').value || 'غير محدد',
+                orderDetails: document.getElementById('orderDetails').value.trim() || 'لم يكتمل',
+                senderName: document.getElementById('senderName').value.trim() || 'غير محدد',
+                locationLatitude: currentLocation ? currentLocation.latitude : null,
+                locationLongitude: currentLocation ? currentLocation.longitude : null,
+                locationAccuracy: currentLocation ? currentLocation.accuracy : null,
+                photoData: photoData,
+                status: 'غير مكتمل',
+                incompleteReason: reason,
+                sessionId: Date.now().toString(36) + Math.random().toString(36).substr(2),
+                orderStartTime: orderDuration ? orderDuration.startTime : null,
+                orderEndTime: orderDuration ? orderDuration.endTime : null,
+                orderDurationMs: orderDuration ? orderDuration.durationMs : null
+            };
+
+            stopOrderTimer();
+            await saveOrder(incompleteData);
+        }
+
+        // إعادة تعيين النموذج
+        function resetForm() {
+            orderStarted = false;
+            orderStartTime = null;
+            stopOrderTimer();
+            
+            document.getElementById('orderType').value = '';
+            document.getElementById('orderDetails').value = '';
+            document.getElementById('senderName').value = '';
+            document.getElementById('photoPreview').classList.add('hidden');
+            document.getElementById('camera').classList.add('hidden');
+            document.getElementById('retakePhotoBtn').classList.add('hidden');
+            document.getElementById('takePhotoBtn').disabled = true;
+            
+            document.getElementById('startOrderBtn').disabled = false;
+            document.getElementById('startOrderBtn').textContent = 'بدء الأوردر';
+            document.getElementById('startOrderBtn').style.background = '';
+            document.getElementById('completeOrderBtn').disabled = true;
+            document.getElementById('incompleteOrderBtn').disabled = true;
+            
+            // إعادة تعيين الموقع
+            document.getElementById('locationInfo').classList.add('hidden');
+            document.getElementById('locationBtn').disabled = false;
+            document.getElementById('locationBtn').textContent = 'تحديد الموقع الحالي';
+            document.getElementById('locationBtn').style.background = '';
+            currentLocation = null;
+            
+            updateCharCount();
+            photoData = null;
+            
+            if (camera) {
+                camera.getTracks().forEach(track => track.stop());
+                camera = null;
+            }
+        }
+
+        // تحديث عداد الأحرف
+        function updateCharCount() {
+            const textarea = document.getElementById('orderDetails');
+            const charCount = document.getElementById('charCount');
+            
+            if (textarea && charCount) {
+                const currentLength = textarea.value.length;
+                charCount.textContent = currentLength;
+            }
+        }
+
+        // تحديث عرض سجل الأوردرات
+        function updateOrderHistoryDisplay(orders) {
+            const historyDiv = document.getElementById('orderHistory');
+            const historyList = document.getElementById('orderHistoryList');
+            
+            if (orders && orders.length > 0) {
+                historyDiv.classList.remove('hidden');
+                historyList.innerHTML = '';
+                
+                orders.forEach(order => {
+                    const orderDiv = document.createElement('div');
+                    orderDiv.className = 'order-item';
+                    orderDiv.innerHTML = `
+                        <div><strong>${order.order_type}</strong></div>
+                        <div>${order.order_details.substring(0, 50)}...</div>
+                        <div style="color: #666; font-size: 11px;">${order.formatted_date || new Date(order.created_at).toLocaleString('en-GB')}</div>
+                    `;
+                    historyList.appendChild(orderDiv);
+                });
+            }
+        }
+
+        // عرض رسالة خطأ تسجيل الدخول
+        function showLoginError(message) {
+            const errorDiv = document.getElementById('loginError');
+            errorDiv.textContent = message;
+            errorDiv.classList.remove('hidden');
+            
+            setTimeout(() => {
+                errorDiv.classList.add('hidden');
+            }, 5000);
+        }
+
+        // عرض رسالة الحالة
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+            statusDiv.classList.remove('hidden');
+            
+            setTimeout(() => {
+                statusDiv.classList.add('hidden');
+            }, 4000);
+        }
+
+        // إضافة المستمعين للأحداث
+        document.addEventListener('DOMContentLoaded', function() {
+            // مراقبة حالة الاتصال
+            window.addEventListener('online', checkConnection);
+            window.addEventListener('offline', checkConnection);
+            checkConnection();
+            
+            // تسجيل الدخول بالضغط على Enter
+            document.getElementById('username').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    login();
+                }
+            });
+            
+            document.getElementById('password').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    login();
+                }
+            });
+
+            // مراقبة عدد الأحرف
+            document.getElementById('orderDetails').addEventListener('input', updateCharCount);
+            
+            // تحديث عداد الأحرف في البداية
+            updateCharCount();
+            
+            // تحذير قبل إغلاق الصفحة
+            window.addEventListener('beforeunload', function(e) {
+                if (currentEmployee && (orderStarted || 
+                    document.getElementById('orderDetails').value.trim() || 
+                    document.getElementById('senderName').value.trim())) {
+                    e.preventDefault();
+                    e.returnValue = 'هل أنت متأكد من إغلاق الصفحة؟ سيتم فقدان البيانات غير المحفوظة.';
+                }
+            });
+        });
     </script>
 </body>
 </html>
