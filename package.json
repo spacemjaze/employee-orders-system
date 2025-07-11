@@ -1,19 +1,70 @@
 {
   "name": "employee-orders-system",
-  "version": "1.0.0",
-  "description": "نظام تسجيل أوردرات الموظفين مع Netlify و Supabase",
+  "version": "2.0.0",
+  "description": "نظام إدارة طلبات التصوير للمراسلين - محدث مع تفاصيل كاملة وتصدير Excel",
   "main": "index.js",
   "scripts": {
     "dev": "netlify dev",
-    "build": "echo 'Build completed'"
+    "build": "npm run build:functions",
+    "build:functions": "echo 'Building functions...'",
+    "start": "netlify dev",
+    "deploy": "netlify deploy",
+    "deploy:prod": "netlify deploy --prod",
+    "test": "echo 'No tests specified'",
+    "lint": "eslint netlify/functions/**/*.js",
+    "format": "prettier --write netlify/functions/**/*.js public/**/*.{html,css,js}"
   },
+  "keywords": [
+    "orders",
+    "management",
+    "video",
+    "reporting",
+    "netlify",
+    "supabase",
+    "arabic"
+  ],
+  "author": "نظام إدارة الطلبات",
+  "license": "MIT",
   "dependencies": {
-    "pg": "^8.11.3",
     "@supabase/supabase-js": "^2.38.0",
+    "jsonwebtoken": "^9.0.2",
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
-    "dotenv": "^16.3.1"
+    "uuid": "^9.0.1",
+    "multer": "^1.4.5-lts.1",
+    "sharp": "^0.32.6",
+    "ffmpeg-static": "^5.2.0",
+    "node-cron": "^3.0.2",
+    "nodemailer": "^6.9.7",
+    "date-fns": "^2.30.0",
+    "validator": "^13.11.0"
+  },
+  "devDependencies": {
+    "netlify-cli": "^17.0.0",
+    "eslint": "^8.52.0",
+    "prettier": "^3.0.3",
+    "@types/node": "^20.8.7"
   },
   "engines": {
-    "node": "18.x"
-  }
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/employee-orders-system.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/employee-orders-system/issues"
+  },
+  "homepage": "https://your-app.netlify.app",
+  "netlify": {
+    "functions": {
+      "directory": "netlify/functions"
+    }
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
 }
