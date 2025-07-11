@@ -42,9 +42,13 @@ exports.handler = async (event, context) => {
         const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
         // 1. إحصائيات عامة
-        const { data: totalStats } = await supabase
+        const { data: totalStats, error: totalError } = await supabase
             .from('orders')
             .select('status, created_at');
+
+        if (totalError) {
+            console.log('خطأ في جلب الإحصائيات العامة:', totalError);
+        }
 
         const totalOrders = totalStats?.length || 0;
         const completedOrders = totalStats?.filter(o => o.status === 'مكتمل').length || 0;
@@ -52,15 +56,8 @@ exports.handler = async (event, context) => {
         const todayOrders = totalStats?.filter(o => o.created_at?.startsWith(today)).length || 0;
         const yesterdayOrders = totalStats?.filter(o => o.created_at?.startsWith(yesterday)).length || 0;
 
-        // 2. إحصائيات الموظفين
-        const { data: employees } = await supabase
-            .from('employees')
-            .select('*')
-            .eq('is_active', true)
-            .order('name');
-
-        // 3. إحصائيات كل موظف اليوم
-        const { data: todayStatsPerEmployee } = await supabase
+        // 2. إحصائيات الموظفين النشطين اليوم
+        const { data: todayStatsPerEmployee, error: statsError } = await supabase
             .from('daily_stats')
             .select(`
                 *,
@@ -68,8 +65,12 @@ exports.handler = async (event, context) => {
             `)
             .eq('date', today);
 
-        // 4. جلسات تسجيل الدخول اليوم
-        const { data: todaySessions } = await supabase
+        if (statsError) {
+            console.log('خطأ في جلب إحصائيات الموظفين:', statsError);
+        }
+
+        // 3. جلسات تسجيل الدخول اليوم
+        const { data: todaySessions, error: sessionsError } = await supabase
             .from('login_sessions')
             .select(`
                 *,
@@ -78,8 +79,12 @@ exports.handler = async (event, context) => {
             .gte('login_time', today + 'T00:00:00')
             .order('login_time', { ascending: false });
 
-        // 5. آخر 20 أوردر من جميع الموظفين
-        const { data: recentOrders } = await supabase
+        if (sessionsError) {
+            console.log('خطأ في جلب جلسات تسجيل الدخول:', sessionsError);
+        }
+
+        // 4. آخر 20 أوردر من جميع الموظفين
+        const { data: recentOrders, error: recentError } = await supabase
             .from('orders')
             .select(`
                 *,
@@ -88,8 +93,12 @@ exports.handler = async (event, context) => {
             .order('created_at', { ascending: false })
             .limit(20);
 
-        // 6. الأوردرات المكتملة اليوم بالتفصيل
-        const { data: todayOrdersDetail } = await supabase
+        if (recentError) {
+            console.log('خطأ في جلب الأوردرات الأخيرة:', recentError);
+        }
+
+        // 5. الأوردرات المكتملة اليوم بالتفصيل
+        const { data: todayOrdersDetail, error: todayOrdersError } = await supabase
             .from('orders')
             .select(`
                 *,
@@ -98,19 +107,9 @@ exports.handler = async (event, context) => {
             .gte('created_at', today + 'T00:00:00')
             .order('created_at', { ascending: false });
 
-        // 7. إحصائيات الأسبوع الماضي
-        const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-        const { data: weeklyStats } = await supabase
-            .from('daily_stats')
-            .select(`
-                date,
-                total_orders,
-                completed_orders,
-                incomplete_orders,
-                employees:employee_id (name)
-            `)
-            .gte('date', weekAgo)
-            .order('date', { ascending: false });
+        if (todayOrdersError) {
+            console.log('خطأ في جلب أوردرات اليوم:', todayOrdersError);
+        }
 
         // تنسيق البيانات
         const formattedRecentOrders = (recentOrders || []).map(order => ({
@@ -172,16 +171,14 @@ exports.handler = async (event, context) => {
                     incompleteOrders,
                     todayOrders,
                     yesterdayOrders,
-                    totalEmployees: employees?.length || 0,
+                    totalEmployees: 6, // عدد الموظفين المعروف
                     activeEmployeesToday: employeeStats.length,
                     completionRate: totalOrders > 0 ? Math.round((completedOrders / totalOrders) * 100) : 0
                 },
                 todayStats: employeeStats,
                 recentOrders: formattedRecentOrders,
                 todayOrders: formattedTodayOrders,
-                activeSessions: activeSessions,
-                employees: employees || [],
-                weeklyTrend: groupByDate(weeklyStats || [])
+                activeSessions: activeSessions
             })
         };
 
@@ -211,28 +208,4 @@ function getTimeAgo(dateString) {
     if (diffMins < 60) return `${diffMins} دقيقة`;
     if (diffHours < 24) return `${diffHours} ساعة`;
     return `${diffDays} يوم`;
-}
-
-// دالة مساعدة لتجميع البيانات حسب التاريخ
-function groupByDate(data) {
-    const grouped = {};
-    data.forEach(item => {
-        const date = item.date;
-        if (!grouped[date]) {
-            grouped[date] = {
-                date,
-                total_orders: 0,
-                completed_orders: 0,
-                incomplete_orders: 0,
-                employees: []
-            };
-        }
-        grouped[date].total_orders += item.total_orders || 0;
-        grouped[date].completed_orders += item.completed_orders || 0;
-        grouped[date].incomplete_orders += item.incomplete_orders || 0;
-        if (item.employees?.name) {
-            grouped[date].employees.push(item.employees.name);
-        }
-    });
-    return Object.values(grouped).sort((a, b) => new Date(b.date) - new Date(a.date));
 }
