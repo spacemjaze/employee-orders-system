@@ -1,4 +1,26 @@
-<!DOCTYPE html>
+// إضافة رابط لوحة المدير للمدراء
+                if (currentEmployee.role === 'admin') {
+                    const adminLink = document.createElement('div');
+                    adminLink.innerHTML = `
+                        <div style="margin-top: 15px; text-align: center;">
+                            <a href="/admin.html" target="_blank" style="
+                                background: linear-gradient(45deg, #28a745, #20c997);
+                                color: white;
+                                padding: 10px 20px;
+                                text-decoration: none;
+                                border-radius: 8px;
+                                font-weight: bold;
+                                display: inline-block;
+                                transition: transform 0.2s;
+                            " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                                🏢 لوحة تحكم المدير (محمية)
+                            </a>
+                            <p style="margin-top: 5px; font-size: 12px; color: #666;">
+                                استخدم نفس بيانات تسجيل الدخول للوصول للوحة التحكم
+                            </p>
+                        </div>
+                    `;
+                    document.getElementById('employeeInfo').appendChild(adminLink<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -533,8 +555,11 @@
                                 display: inline-block;
                                 transition: transform 0.2s;
                             " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
-                                🏢 لوحة تحكم المدير
+                                🏢 لوحة تحكم المدير (محمية)
                             </a>
+                            <p style="margin-top: 5px; font-size: 12px; color: #666;">
+                                استخدم نفس بيانات تسجيل الدخول للوصول للوحة التحكم
+                            </p>
                         </div>
                     `;
                     document.getElementById('employeeInfo').appendChild(adminLink);
