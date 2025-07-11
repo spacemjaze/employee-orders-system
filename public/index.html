@@ -518,6 +518,28 @@
                 document.getElementById('lastLogin').textContent = currentEmployee.lastLogin;
                 document.getElementById('todayOrders').textContent = currentEmployee.todayOrders;
                 
+                // إضافة رابط لوحة المدير للمدراء
+                if (currentEmployee.role === 'admin') {
+                    const adminLink = document.createElement('div');
+                    adminLink.innerHTML = `
+                        <div style="margin-top: 15px; text-align: center;">
+                            <a href="/admin.html" target="_blank" style="
+                                background: linear-gradient(45deg, #28a745, #20c997);
+                                color: white;
+                                padding: 10px 20px;
+                                text-decoration: none;
+                                border-radius: 8px;
+                                font-weight: bold;
+                                display: inline-block;
+                                transition: transform 0.2s;
+                            " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                                🏢 لوحة تحكم المدير
+                            </a>
+                        </div>
+                    `;
+                    document.getElementById('employeeInfo').appendChild(adminLink);
+                }
+                
                 // إخفاء قسم تسجيل الدخول وإظهار قسم الأوردر
                 document.getElementById('loginSection').style.display = 'none';
                 document.getElementById('orderSection').style.display = 'block';
@@ -536,7 +558,7 @@
         // تحميل إحصائيات الموظف
         async function loadEmployeeStats() {
             try {
-                const result = await makeRequest(`${API_BASE_URL}/employee-stats?employeeId=${currentEmployee.id}`);
+                const result = await makeRequest(`${API_BASE_URL}/employee-stats-supabase?employeeId=${currentEmployee.id}`);
                 
                 // تحديث الإحصائيات
                 document.getElementById('todayOrders').textContent = result.todayStats.total_orders;
@@ -555,7 +577,7 @@
                 showStatus('جاري حفظ الأوردر...', 'info');
                 document.getElementById('loadingSpinner').style.display = 'block';
                 
-                const result = await makeRequest(`${API_BASE_URL}/save-order`, {
+                const result = await makeRequest(`${API_BASE_URL}/save-order-supabase`, {
                     method: 'POST',
                     body: JSON.stringify(orderData)
                 });
