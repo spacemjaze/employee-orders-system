@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول - نظام طلبات التصوير</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .login-container {
+            max-width: 400px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .login-header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0,123,255,0.3);
+        }
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .login-btn:hover {
+            background-color: #0056b3;
+        }
+        .login-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .error-message {
+            color: #dc3545;
+            text-align: center;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            display: none;
+        }
+        .success-message {
+            color: #155724;
+            text-align: center;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 4px;
+            display: none;
+        }
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .back-link a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+        .demo-credentials {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        .demo-credentials h4 {
+            margin-top: 0;
+            color: #495057;
+        }
+        .demo-credentials p {
+            margin: 5px 0;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1>تسجيل الدخول</h1>
+            <p>نظام إدارة طلبات التصوير</p>
+        </div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">البريد الإلكتروني:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">كلمة المرور:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+
+            <button type="submit" class="login-btn" id="loginBtn">
+                تسجيل الدخول
+            </button>
+        </form>
+
+        <div id="errorMessage" class="error-message"></div>
+        <div id="successMessage" class="success-message"></div>
+
+        <div class="demo-credentials">
+            <h4>🔑 بيانات تجريبية للاختبار:</h4>
+            <p><strong>موظف:</strong> employee@company.com / password</p>
+            <p><strong>إداري:</strong> admin@company.com / admin</p>
+            <p style="margin-top: 10px;"><em>أو استخدم أي من البريد الإلكتروني للمراسلين من قاعدة البيانات</em></p>
+        </div>
+
+        <div class="back-link">
+            <a href="/">العودة للصفحة الرئيسية</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // إعداد Supabase
+        const supabaseUrl = 'https://hemfegaipidqqojuasdc.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlbWZlZ2FpcGlkcXFvanVhc2RjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIxNjQ0MjcsImV4cCI6MjA2Nzc0MDQyN30.Q0EWQQgV8Mm1fdbuj0U9lb0-shoDazWJ9djtOaYKTdU';
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+
+            // إخفاء الرسائل السابقة
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+
+            if (!email || !password) {
+                showError('يرجى إدخال البريد الإلكتروني وكلمة المرور');
+                return;
+            }
+
+            // تعطيل الزر أثناء المعالجة
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'جاري تسجيل الدخول...';
+
+            try {
+                // التحقق من بيانات تجريبية أولاً
+                if (await checkDemoCredentials(email, password)) {
+                    return;
+                }
+
+                // محاولة تسجيل الدخول مع Supabase Auth
+                const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+
+                if (authError) {
+                    // إذا فشل تسجيل الدخول مع Auth، تحقق من جدول الموظفين
+                    await checkEmployeeDatabase(email, password);
+                } else {
+                    // نجح تسجيل الدخول مع Auth
+                    await handleSuccessfulLogin(authData.user, 'authenticated');
+                }
+
+            } catch (error) {
+                console.error('Login error:', error);
+                showError('حدث خطأ أثناء تسجيل الدخول: ' + error.message);
+            } finally {
+                // إعادة تفعيل الزر
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'تسجيل الدخول';
+            }
+        });
+
+        // فحص البيانات التجريبية
+        async function checkDemoCredentials(email, password) {
+            const demoUsers = [
+                { email: 'employee@company.com', password: 'password', role: 'employee', name: 'موظف تجريبي' },
+                { email: 'admin@company.com', password: 'admin', role: 'admin', name: 'إداري تجريبي' }
+            ];
+
+            const user = demoUsers.find(u => u.email === email && u.password === password);
+            if (user) {
+                await handleSuccessfulLogin(user, 'demo');
+                return true;
+            }
+            return false;
+        }
+
+        // فحص قاعدة بيانات الموظفين
+        async function checkEmployeeDatabase(email, password) {
+            try {
+                const { data: employees, error } = await supabaseClient
+                    .from('employees')
+                    .select('*')
+                    .eq('email', email)
+                    .eq('is_active', true);
+
+                if (error) {
+                    throw error;
+                }
+
+                if (employees && employees.length > 0) {
+                    const employee = employees[0];
+                    // في التطبيق الحقيقي، يجب التحقق من كلمة المرور المشفرة
+                    // هنا نقبل أي كلمة مرور للاختبار
+                    await handleSuccessfulLogin(employee, 'employee');
+                } else {
+                    throw new Error('البريد الإلكتروني أو كلمة المرور غير صحيحة');
+                }
+            } catch (error) {
+                throw new Error('البريد الإلكتروني أو كلمة المرور غير صحيحة');
+            }
+        }
+
+        // التعامل مع تسجيل الدخول الناجح
+        async function handleSuccessfulLogin(user, type) {
+            const userData = {
+                id: user.id,
+                email: user.email,
+                name: user.name || user.email.split('@')[0],
+                role: determineUserRole(user, type),
+                type: type
+            };
+
+            // حفظ بيانات الجلسة
+            localStorage.setItem('userSession', JSON.stringify({
+                user: userData,
+                loginTime: new Date().toISOString(),
+                expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+            }));
+
+            // عرض رسالة نجاح
+            showSuccess('تم تسجيل الدخول بنجاح!');
+
+            // التوجيه حسب نوع المستخدم
+            setTimeout(() => {
+                if (userData.role === 'admin') {
+                    window.location.href = '/admin.html';
+                } else {
+                    window.location.href = '/employee-dashboard.html';
+                }
+            }, 1500);
+        }
+
+        // تحديد دور المستخدم
+        function determineUserRole(user, type) {
+            if (type === 'demo') {
+                return user.role;
+            } else if (type === 'authenticated') {
+                // تحقق من البيانات الوصفية في Supabase Auth
+                return user.user_metadata?.role || 'employee';
+            } else if (type === 'employee') {
+                // من جدول الموظفين
+                return user.position === 'إداري' || user.department === 'الإدارة' ? 'admin' : 'employee';
+            }
+            return 'employee';
+        }
+
+        // عرض رسالة خطأ
+        function showError(message) {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            
+            setTimeout(() => {
+                errorMessage.style.display = 'none';
+            }, 5000);
+        }
+
+        // عرض رسالة نجاح
+        function showSuccess(message) {
+            const successMessage = document.getElementById('successMessage');
+            successMessage.textContent = message;
+            successMessage.style.display = 'block';
+        }
+
+        // التحقق من وجود جلسة نشطة
+        function checkExistingSession() {
+            const session = localStorage.getItem('userSession');
+            if (session) {
+                try {
+                    const sessionData = JSON.parse(session);
+                    const now = new Date();
+                    const expiresAt = new Date(sessionData.expiresAt);
+
+                    if (now < expiresAt) {
+                        // الجلسة ما زالت سارية
+                        showSuccess('لديك جلسة نشطة، جاري التوجيه...');
+                        setTimeout(() => {
+                            if (sessionData.user.role === 'admin') {
+                                window.location.href = '/admin.html';
+                            } else {
+                                window.location.href = '/employee-dashboard.html';
+                            }
+                        }, 1000);
+                    } else {
+                        // انتهت صلاحية الجلسة
+                        localStorage.removeItem('userSession');
+                    }
+                } catch (error) {
+                    // بيانات جلسة تالفة
+                    localStorage.removeItem('userSession');
+                }
+            }
+        }
+
+        // فحص الجلسة عند تحميل الصفحة
+        checkExistingSession();
+    </script>
+</body>
+</html>
