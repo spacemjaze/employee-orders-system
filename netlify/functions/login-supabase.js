@@ -1,10 +1,19 @@
+// netlify/functions/login-supabase.js
 const { createClient } = require('@supabase/supabase-js');
+const jwt = require('jsonwebtoken');
+
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
+const jwtSecret = process.env.JWT_SECRET || 'your-secret-key';
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 exports.handler = async (event, context) => {
     const headers = {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Content-Type': 'application/json'
     };
 
     if (event.httpMethod === 'OPTIONS') {
@@ -15,156 +24,90 @@ exports.handler = async (event, context) => {
         return {
             statusCode: 405,
             headers,
-            body: JSON.stringify({ success: false, message: 'Method not allowed' })
+            body: JSON.stringify({ error: 'Method not allowed' })
         };
     }
 
     try {
-        console.log('Starting Supabase login process...');
+        const { email, password, userType } = JSON.parse(event.body);
 
-        // التحقق من متغيرات البيئة
-        if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
-            return {
-                statusCode: 500,
-                headers,
-                body: JSON.stringify({ 
-                    success: false, 
-                    message: 'إعدادات Supabase غير مكتملة' 
-                })
-            };
-        }
-
-        if (!event.body) {
+        if (!email || !password) {
             return {
                 statusCode: 400,
                 headers,
-                body: JSON.stringify({ 
-                    success: false, 
-                    message: 'لا توجد بيانات في الطلب' 
+                body: JSON.stringify({
+                    error: 'البريد الإلكتروني وكلمة المرور مطلوبان'
                 })
             };
         }
 
-        const { username, password } = JSON.parse(event.body);
-        console.log('Login attempt for username:', username);
+        // تسجيل الدخول عبر Supabase Auth
+        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+            email,
+            password
+        });
 
-        if (!username || !password) {
-            return {
-                statusCode: 400,
-                headers,
-                body: JSON.stringify({ 
-                    success: false, 
-                    message: 'يرجى إدخال اسم المستخدم وكلمة المرور' 
-                })
-            };
-        }
-
-        // إنشاء Supabase client
-        const supabase = createClient(
-            process.env.SUPABASE_URL,
-            process.env.SUPABASE_ANON_KEY
-        );
-
-        console.log('Supabase client created successfully');
-
-        // البحث عن الموظف
-        const { data: employees, error } = await supabase
-            .from('employees')
-            .select('*')
-            .eq('username', username)
-            .eq('is_active', true);
-
-        if (error) {
-            console.error('Supabase query error:', error);
-            return {
-                statusCode: 500,
-                headers,
-                body: JSON.stringify({ 
-                    success: false, 
-                    message: 'خطأ في البحث عن الموظف: ' + error.message 
-                })
-            };
-        }
-
-        console.log('Query result:', employees ? employees.length : 0, 'employees found');
-
-        if (!employees || employees.length === 0) {
+        if (authError) {
+            console.error('Auth error:', authError);
             return {
                 statusCode: 401,
                 headers,
-                body: JSON.stringify({ 
-                    success: false, 
-                    message: 'اسم المستخدم غير صحيح' 
+                body: JSON.stringify({
+                    error: 'بيانات الدخول غير صحيحة'
                 })
             };
         }
 
-        const employee = employees[0];
-        console.log('Employee found:', employee.name);
-
-        // التحقق من كلمة المرور
-        const passwords = {
-            'admin': 'admin123',
-            'ahmed_thaer': 'ahmed123',
-            'qutaiba_rashid': 'qutaiba123',
-            'amer_abdullah': 'amer123',
-            'osama_yassin': 'osama123',
-            'montazer_mohammed': 'montazer123'
-        };
-
-        const passwordValid = passwords[username] === password;
-        console.log('Password valid:', passwordValid);
-
-        if (!passwordValid) {
-            return {
-                statusCode: 401,
-                headers,
-                body: JSON.stringify({ 
-                    success: false, 
-                    message: 'كلمة المرور غير صحيحة' 
-                })
+        // التحقق من نوع المستخدم
+        let userData = null;
+        if (userType === 'admin') {
+            // للإداريين - يمكن إضافة جدول admins منفصل
+            userData = {
+                id: authData.user.id,
+                email: authData.user.email,
+                role: 'admin',
+                name: authData.user.user_metadata?.name || 'إداري'
             };
-        }
-
-        // تسجيل جلسة تسجيل الدخول
-        try {
-            const { error: sessionError } = await supabase
-                .from('login_sessions')
-                .insert({
-                    employee_id: employee.id,
-                    ip_address: event.headers['x-forwarded-for'] || event.headers['x-real-ip'] || 'unknown',
-                    user_agent: event.headers['user-agent'] || 'unknown'
-                });
-
-            if (sessionError) {
-                console.log('Session recording failed:', sessionError);
-            } else {
-                console.log('Login session recorded successfully');
-            }
-        } catch (sessionError) {
-            console.log('Session recording error:', sessionError);
-        }
-
-        // الحصول على إحصائيات اليوم
-        const today = new Date().toISOString().split('T')[0];
-        let todayOrders = 0;
-
-        try {
-            const { data: todayStats, error: statsError } = await supabase
-                .from('daily_stats')
-                .select('total_orders')
-                .eq('employee_id', employee.id)
-                .eq('date', today)
+        } else {
+            // للمراسلين - البحث في جدول employees
+            const { data: employeeData, error: employeeError } = await supabase
+                .from('employees')
+                .select('*')
+                .eq('email', email)
+                .eq('is_active', true)
                 .single();
 
-            if (!statsError && todayStats) {
-                todayOrders = todayStats.total_orders;
+            if (employeeError || !employeeData) {
+                return {
+                    statusCode: 401,
+                    headers,
+                    body: JSON.stringify({
+                        error: 'المستخدم غير مسجل أو غير مفعل'
+                    })
+                };
             }
-            console.log('Today stats loaded:', todayOrders);
-        } catch (statsError) {
-            console.log('Stats loading failed:', statsError);
-            // نكمل مع القيم الافتراضية
+
+            userData = {
+                id: employeeData.id,
+                email: employeeData.email,
+                name: employeeData.name,
+                department: employeeData.department,
+                position: employeeData.position,
+                role: 'employee'
+            };
         }
+
+        // إنشاء JWT token
+        const token = jwt.sign(
+            {
+                userId: userData.id,
+                email: userData.email,
+                role: userData.role,
+                name: userData.name
+            },
+            jwtSecret,
+            { expiresIn: '24h' }
+        );
 
         return {
             statusCode: 200,
@@ -172,26 +115,22 @@ exports.handler = async (event, context) => {
             body: JSON.stringify({
                 success: true,
                 message: 'تم تسجيل الدخول بنجاح',
-                employee: {
-                    id: employee.id,
-                    name: employee.name,
-                    employee_id: employee.employee_id,
-                    username: employee.username,
-                    role: employee.role,
-                    todayOrders: todayOrders,
-                    lastLogin: new Date().toLocaleString('en-GB')
+                data: {
+                    token,
+                    user: userData,
+                    expiresIn: '24h'
                 }
             })
         };
 
     } catch (error) {
-        console.error('Login error details:', error);
+        console.error('Login error:', error);
         return {
             statusCode: 500,
             headers,
-            body: JSON.stringify({ 
-                success: false, 
-                message: 'خطأ في الخادم: ' + error.message 
+            body: JSON.stringify({
+                error: 'خطأ في الخادم',
+                message: error.message
             })
         };
     }
