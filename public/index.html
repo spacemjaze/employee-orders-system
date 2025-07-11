@@ -540,29 +540,42 @@
                 document.getElementById('lastLogin').textContent = currentEmployee.lastLogin;
                 document.getElementById('todayOrders').textContent = currentEmployee.todayOrders;
                 
-                // إضافة رابط لوحة المدير للمدراء
+                // إضافة رابط لوحة المدير للمدراء فقط
                 if (currentEmployee.role === 'admin') {
-                    const adminLink = document.createElement('div');
-                    adminLink.innerHTML = `
-                        <div style="margin-top: 15px; text-align: center;">
-                            <a href="/admin.html" target="_blank" style="
-                                background: linear-gradient(45deg, #28a745, #20c997);
-                                color: white;
-                                padding: 10px 20px;
-                                text-decoration: none;
-                                border-radius: 8px;
-                                font-weight: bold;
-                                display: inline-block;
-                                transition: transform 0.2s;
-                            " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
-                                🏢 لوحة تحكم المدير (محمية)
-                            </a>
-                            <p style="margin-top: 5px; font-size: 12px; color: #666;">
-                                استخدم نفس بيانات تسجيل الدخول للوصول للوحة التحكم
-                            </p>
-                        </div>
-                    `;
-                    document.getElementById('employeeInfo').appendChild(adminLink);
+                    const adminLinkDiv = document.createElement('div');
+                    adminLinkDiv.style.marginTop = '15px';
+                    adminLinkDiv.style.textAlign = 'center';
+                    
+                    const adminLink = document.createElement('a');
+                    adminLink.href = '/admin.html';
+                    adminLink.target = '_blank';
+                    adminLink.textContent = '🏢 لوحة تحكم المدير (محمية)';
+                    adminLink.style.background = 'linear-gradient(45deg, #28a745, #20c997)';
+                    adminLink.style.color = 'white';
+                    adminLink.style.padding = '10px 20px';
+                    adminLink.style.textDecoration = 'none';
+                    adminLink.style.borderRadius = '8px';
+                    adminLink.style.fontWeight = 'bold';
+                    adminLink.style.display = 'inline-block';
+                    adminLink.style.transition = 'transform 0.2s';
+                    
+                    adminLink.addEventListener('mouseover', function() {
+                        this.style.transform = 'translateY(-2px)';
+                    });
+                    
+                    adminLink.addEventListener('mouseout', function() {
+                        this.style.transform = 'translateY(0)';
+                    });
+                    
+                    const helpText = document.createElement('p');
+                    helpText.textContent = 'استخدم نفس بيانات تسجيل الدخول للوصول للوحة التحكم';
+                    helpText.style.marginTop = '5px';
+                    helpText.style.fontSize = '12px';
+                    helpText.style.color = '#666';
+                    
+                    adminLinkDiv.appendChild(adminLink);
+                    adminLinkDiv.appendChild(helpText);
+                    document.getElementById('employeeInfo').appendChild(adminLinkDiv);
                 }
                 
                 // إخفاء قسم تسجيل الدخول وإظهار قسم الأوردر
