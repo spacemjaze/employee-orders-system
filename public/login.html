@@ -36,7 +36,7 @@
             color: #555;
             font-weight: bold;
         }
-        .form-group input {
+        .form-group input, .form-group select {
             width: 100%;
             padding: 12px;
             border: 1px solid #ddd;
@@ -44,7 +44,7 @@
             font-size: 16px;
             box-sizing: border-box;
         }
-        .form-group input:focus {
+        .form-group input:focus, .form-group select:focus {
             outline: none;
             border-color: #007bff;
             box-shadow: 0 0 5px rgba(0,123,255,0.3);
@@ -110,8 +110,28 @@
             margin-top: 0;
             color: #495057;
         }
-        .demo-credentials p {
-            margin: 5px 0;
+        .demo-credentials .user-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .demo-credentials .user-item {
+            padding: 8px;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #e9ecef;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .demo-credentials .user-item:hover {
+            background-color: #e9ecef;
+        }
+        .demo-credentials .user-item strong {
+            display: block;
+            color: #007bff;
+        }
+        .demo-credentials .user-item small {
             color: #6c757d;
         }
     </style>
@@ -125,8 +145,16 @@
 
         <form id="loginForm">
             <div class="form-group">
-                <label for="email">البريد الإلكتروني:</label>
-                <input type="email" id="email" name="email" required>
+                <label for="username">اسم المستخدم:</label>
+                <select id="username" name="username" required>
+                    <option value="">اختر اسم المستخدم</option>
+                    <option value="admin">admin - الإدارة</option>
+                    <option value="ahmed_thaer">ahmed_thaer - أحمد ثاير</option>
+                    <option value="qutaiba_rashid">qutaiba_rashid - قتيبة راشد</option>
+                    <option value="amer_abdullah">amer_abdullah - عامر عبدالله</option>
+                    <option value="osama_yassin">osama_yassin - أسامة ياسين</option>
+                    <option value="montazer_mohammed">montazer_mohammed - منتظر محمد</option>
+                </select>
             </div>
 
             <div class="form-group">
@@ -143,10 +171,34 @@
         <div id="successMessage" class="success-message"></div>
 
         <div class="demo-credentials">
-            <h4>🔑 بيانات تجريبية للاختبار:</h4>
-            <p><strong>موظف:</strong> employee@company.com / password</p>
-            <p><strong>إداري:</strong> admin@company.com / admin</p>
-            <p style="margin-top: 10px;"><em>أو استخدم أي من البريد الإلكتروني للمراسلين من قاعدة البيانات</em></p>
+            <h4>🔑 بيانات المستخدمين المتاحة:</h4>
+            <div class="user-list">
+                <div class="user-item" onclick="fillCredentials('admin', 'admin123')">
+                    <strong>admin</strong>
+                    <small>admin123</small>
+                </div>
+                <div class="user-item" onclick="fillCredentials('ahmed_thaer', 'ahmed123')">
+                    <strong>ahmed_thaer</strong>
+                    <small>ahmed123</small>
+                </div>
+                <div class="user-item" onclick="fillCredentials('qutaiba_rashid', 'qutaiba123')">
+                    <strong>qutaiba_rashid</strong>
+                    <small>qutaiba123</small>
+                </div>
+                <div class="user-item" onclick="fillCredentials('amer_abdullah', 'amer123')">
+                    <strong>amer_abdullah</strong>
+                    <small>amer123</small>
+                </div>
+                <div class="user-item" onclick="fillCredentials('osama_yassin', 'osama123')">
+                    <strong>osama_yassin</strong>
+                    <small>osama123</small>
+                </div>
+                <div class="user-item" onclick="fillCredentials('montazer_mohammed', 'montazer123')">
+                    <strong>montazer_mohammed</strong>
+                    <small>montazer123</small>
+                </div>
+            </div>
+            <p style="margin-top: 10px; font-style: italic; color: #6c757d;">انقر على أي مستخدم للملء التلقائي</p>
         </div>
 
         <div class="back-link">
@@ -154,28 +206,30 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // إعداد Supabase
-        const supabaseUrl = 'https://hemfegaipidqqojuasdc.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlbWZlZ2FpcGlkcXFvanVhc2RjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIxNjQ0MjcsImV4cCI6MjA2Nzc0MDQyN30.Q0EWQQgV8Mm1fdbuj0U9lb0-shoDazWJ9djtOaYKTdU';
-        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+        // متغيرات الاتصال
+        const API_BASE = '/.netlify/functions';
+        
+        // ملء البيانات تلقائياً
+        function fillCredentials(username, password) {
+            document.getElementById('username').value = username;
+            document.getElementById('password').value = password;
+            showSuccess('تم ملء البيانات تلقائياً');
+        }
 
+        // معالج تسجيل الدخول
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const email = document.getElementById('email').value.trim();
+            const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
             const loginBtn = document.getElementById('loginBtn');
-            const errorMessage = document.getElementById('errorMessage');
-            const successMessage = document.getElementById('successMessage');
 
             // إخفاء الرسائل السابقة
-            errorMessage.style.display = 'none';
-            successMessage.style.display = 'none';
+            hideMessages();
 
-            if (!email || !password) {
-                showError('يرجى إدخال البريد الإلكتروني وكلمة المرور');
+            if (!username || !password) {
+                showError('يرجى إدخال اسم المستخدم وكلمة المرور');
                 return;
             }
 
@@ -184,119 +238,58 @@
             loginBtn.textContent = 'جاري تسجيل الدخول...';
 
             try {
-                // التحقق من بيانات تجريبية أولاً
-                if (await checkDemoCredentials(email, password)) {
-                    return;
-                }
-
-                // محاولة تسجيل الدخول مع Supabase Auth
-                const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
-                    email: email,
-                    password: password
+                // محاولة تسجيل الدخول
+                const response = await fetch(`${API_BASE}/login-supabase`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password
+                    })
                 });
 
-                if (authError) {
-                    // إذا فشل تسجيل الدخول مع Auth، تحقق من جدول الموظفين
-                    await checkEmployeeDatabase(email, password);
+                const result = await response.json();
+
+                if (result.success) {
+                    // حفظ بيانات الجلسة
+                    localStorage.setItem('userSession', JSON.stringify({
+                        user: {
+                            id: result.employee.id,
+                            name: result.employee.name,
+                            username: result.employee.username,
+                            role: result.employee.role,
+                            employee_id: result.employee.employee_id
+                        },
+                        loginTime: new Date().toISOString(),
+                        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+                    }));
+
+                    showSuccess(`مرحباً ${result.employee.name}! تم تسجيل الدخول بنجاح`);
+
+                    // التوجيه حسب دور المستخدم
+                    setTimeout(() => {
+                        if (result.employee.role === 'admin' || result.employee.username === 'admin') {
+                            window.location.href = 'admin.html';
+                        } else {
+                            window.location.href = 'employee-dashboard.html';
+                        }
+                    }, 2000);
+
                 } else {
-                    // نجح تسجيل الدخول مع Auth
-                    await handleSuccessfulLogin(authData.user, 'authenticated');
+                    showError(result.message || 'فشل في تسجيل الدخول');
                 }
 
             } catch (error) {
                 console.error('Login error:', error);
-                showError('حدث خطأ أثناء تسجيل الدخول: ' + error.message);
+                showError('حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى.');
             } finally {
                 // إعادة تفعيل الزر
                 loginBtn.disabled = false;
                 loginBtn.textContent = 'تسجيل الدخول';
             }
         });
-
-        // فحص البيانات التجريبية
-        async function checkDemoCredentials(email, password) {
-            const demoUsers = [
-                { email: 'employee@company.com', password: 'password', role: 'employee', name: 'موظف تجريبي' },
-                { email: 'admin@company.com', password: 'admin', role: 'admin', name: 'إداري تجريبي' }
-            ];
-
-            const user = demoUsers.find(u => u.email === email && u.password === password);
-            if (user) {
-                await handleSuccessfulLogin(user, 'demo');
-                return true;
-            }
-            return false;
-        }
-
-        // فحص قاعدة بيانات الموظفين
-        async function checkEmployeeDatabase(email, password) {
-            try {
-                const { data: employees, error } = await supabaseClient
-                    .from('employees')
-                    .select('*')
-                    .eq('email', email)
-                    .eq('is_active', true);
-
-                if (error) {
-                    throw error;
-                }
-
-                if (employees && employees.length > 0) {
-                    const employee = employees[0];
-                    // في التطبيق الحقيقي، يجب التحقق من كلمة المرور المشفرة
-                    // هنا نقبل أي كلمة مرور للاختبار
-                    await handleSuccessfulLogin(employee, 'employee');
-                } else {
-                    throw new Error('البريد الإلكتروني أو كلمة المرور غير صحيحة');
-                }
-            } catch (error) {
-                throw new Error('البريد الإلكتروني أو كلمة المرور غير صحيحة');
-            }
-        }
-
-        // التعامل مع تسجيل الدخول الناجح
-        async function handleSuccessfulLogin(user, type) {
-            const userData = {
-                id: user.id,
-                email: user.email,
-                name: user.name || user.email.split('@')[0],
-                role: determineUserRole(user, type),
-                type: type
-            };
-
-            // حفظ بيانات الجلسة
-            localStorage.setItem('userSession', JSON.stringify({
-                user: userData,
-                loginTime: new Date().toISOString(),
-                expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
-            }));
-
-            // عرض رسالة نجاح
-            showSuccess('تم تسجيل الدخول بنجاح!');
-
-            // التوجيه حسب نوع المستخدم
-            setTimeout(() => {
-                if (userData.role === 'admin') {
-                    window.location.href = '/admin.html';
-                } else {
-                    window.location.href = '/employee-dashboard.html';
-                }
-            }, 1500);
-        }
-
-        // تحديد دور المستخدم
-        function determineUserRole(user, type) {
-            if (type === 'demo') {
-                return user.role;
-            } else if (type === 'authenticated') {
-                // تحقق من البيانات الوصفية في Supabase Auth
-                return user.user_metadata?.role || 'employee';
-            } else if (type === 'employee') {
-                // من جدول الموظفين
-                return user.position === 'إداري' || user.department === 'الإدارة' ? 'admin' : 'employee';
-            }
-            return 'employee';
-        }
 
         // عرض رسالة خطأ
         function showError(message) {
@@ -314,6 +307,16 @@
             const successMessage = document.getElementById('successMessage');
             successMessage.textContent = message;
             successMessage.style.display = 'block';
+            
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+            }, 3000);
+        }
+
+        // إخفاء جميع الرسائل
+        function hideMessages() {
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
         }
 
         // التحقق من وجود جلسة نشطة
@@ -327,14 +330,14 @@
 
                     if (now < expiresAt) {
                         // الجلسة ما زالت سارية
-                        showSuccess('لديك جلسة نشطة، جاري التوجيه...');
+                        showSuccess(`مرحباً ${sessionData.user.name}! لديك جلسة نشطة، جاري التوجيه...`);
                         setTimeout(() => {
-                            if (sessionData.user.role === 'admin') {
-                                window.location.href = '/admin.html';
+                            if (sessionData.user.role === 'admin' || sessionData.user.username === 'admin') {
+                                window.location.href = 'admin.html';
                             } else {
-                                window.location.href = '/employee-dashboard.html';
+                                window.location.href = 'employee-dashboard.html';
                             }
-                        }, 1000);
+                        }, 2000);
                     } else {
                         // انتهت صلاحية الجلسة
                         localStorage.removeItem('userSession');
@@ -348,6 +351,23 @@
 
         // فحص الجلسة عند تحميل الصفحة
         checkExistingSession();
+
+        // تحديث كلمة المرور تلقائياً عند تغيير اسم المستخدم
+        document.getElementById('username').addEventListener('change', function() {
+            const username = this.value;
+            const passwordMap = {
+                'admin': 'admin123',
+                'ahmed_thaer': 'ahmed123',
+                'qutaiba_rashid': 'qutaiba123',
+                'amer_abdullah': 'amer123',
+                'osama_yassin': 'osama123',
+                'montazer_mohammed': 'montazer123'
+            };
+            
+            if (passwordMap[username]) {
+                document.getElementById('password').value = passwordMap[username];
+            }
+        });
     </script>
 </body>
 </html>
