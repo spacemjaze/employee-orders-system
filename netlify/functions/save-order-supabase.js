@@ -59,6 +59,8 @@ exports.handler = async (event, context) => {
             orderDurationMs
         } = JSON.parse(event.body);
 
+        console.log('حفظ أوردر جديد للموظف:', employeeId);
+
         // التحقق من البيانات المطلوبة
         if (!employeeId || !orderType || !orderDetails || !senderName) {
             return {
@@ -111,6 +113,8 @@ exports.handler = async (event, context) => {
             };
         }
 
+        console.log('تم حفظ الأوردر بنجاح، ID:', orderData.id);
+
         // تحديث الإحصائيات اليومية
         const today = new Date().toISOString().split('T')[0];
         
@@ -124,7 +128,7 @@ exports.handler = async (event, context) => {
 
         if (existingStats) {
             // تحديث الإحصائيات الموجودة
-            await supabase
+            const { error: updateError } = await supabase
                 .from('daily_stats')
                 .update({
                     total_orders: existingStats.total_orders + 1,
@@ -134,9 +138,15 @@ exports.handler = async (event, context) => {
                 })
                 .eq('employee_id', employeeId)
                 .eq('date', today);
+
+            if (updateError) {
+                console.log('خطأ في تحديث الإحصائيات:', updateError);
+            } else {
+                console.log('تم تحديث الإحصائيات بنجاح');
+            }
         } else {
             // إنشاء إحصائيات جديدة
-            await supabase
+            const { error: insertError } = await supabase
                 .from('daily_stats')
                 .insert({
                     employee_id: employeeId,
@@ -145,6 +155,12 @@ exports.handler = async (event, context) => {
                     completed_orders: status === 'مكتمل' ? 1 : 0,
                     incomplete_orders: status === 'غير مكتمل' ? 1 : 0
                 });
+
+            if (insertError) {
+                console.log('خطأ في إنشاء الإحصائيات:', insertError);
+            } else {
+                console.log('تم إنشاء إحصائيات جديدة');
+            }
         }
 
         return {
@@ -153,7 +169,12 @@ exports.handler = async (event, context) => {
             body: JSON.stringify({
                 success: true,
                 message: 'تم حفظ الأوردر بنجاح',
-                orderId: orderData.id
+                orderId: orderData.id,
+                orderDetails: {
+                    type: orderData.order_type,
+                    status: orderData.status,
+                    createdAt: orderData.created_at
+                }
             })
         };
 
